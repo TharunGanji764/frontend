@@ -83,7 +83,7 @@ export default function ProductCard({ product }: Props) {
             : dispatch(addToWishlist(product))
         }
       >
-        {inWishlist ? <Favorite /> : <FavoriteBorderIcon />}
+        {inWishlist ? <Favorite color="error" /> : <FavoriteBorderIcon />}
       </IconButton>
 
       {/* Image */}

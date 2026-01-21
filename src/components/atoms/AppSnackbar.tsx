@@ -1,4 +1,7 @@
+import { AppDispatch, RootState } from "@/store";
+import { hideToast } from "@/store/slices/toastSlice";
 import { Snackbar, Alert } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
 
 interface Props {
   open: boolean;
@@ -7,14 +10,18 @@ interface Props {
   onClose: () => void;
 }
 
-export default function AppSnackbar({
-  open,
-  message,
-  severity = "success",
-  onClose,
-}: Props) {
+export default function AppSnackbar() {
+  const { open, message, severity } = useSelector(
+    (state: RootState) => state.toast
+  );
+  const dispatch = useDispatch<AppDispatch>();
   return (
-    <Snackbar open={open} autoHideDuration={3000} onClose={onClose}>
+    <Snackbar
+      open={open}
+      autoHideDuration={2000}
+      onClose={() => dispatch(hideToast())}
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+    >
       <Alert severity={severity} variant="filled">
         {message}
       </Alert>

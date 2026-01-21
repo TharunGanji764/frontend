@@ -1,22 +1,25 @@
-import { Menu, MenuItem, Button } from "@mui/material";
+import { FormControl, Select, MenuItem } from "@mui/material";
 import { useState } from "react";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
-export default function CategoryMenu() {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+export default function CategoriesDropdown() {
+  const [category, setCategory] = useState("");
 
   return (
-    <>
-      <Button onClick={(e) => setAnchorEl(e.currentTarget)}>Categories</Button>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={() => setAnchorEl(null)}
+    <FormControl size="small">
+      <Select
+        value={category}
+        displayEmpty
+        onChange={(e) => setCategory(e.target.value)}
+        renderValue={(selected) => (selected ? selected : "Categories")}
+        sx={{ minWidth: "140px" }}
+        IconComponent={KeyboardArrowDownIcon}
       >
-        <MenuItem>Electronics</MenuItem>
-        <MenuItem>Fashion</MenuItem>
-        <MenuItem>Home</MenuItem>
-        <MenuItem>Beauty</MenuItem>
-      </Menu>
-    </>
+        <MenuItem value="electronics">Electronics</MenuItem>
+        <MenuItem value="fashion">Fashion</MenuItem>
+        <MenuItem value="home">Home</MenuItem>
+        <MenuItem value="beauty">Beauty</MenuItem>
+      </Select>
+    </FormControl>
   );
 }

@@ -5,27 +5,32 @@ import {
   Typography,
   IconButton,
   Badge,
-  InputBase,
   Button,
   TextField,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import SearchIcon from "@mui/icons-material/Search";
 import { useRouter } from "next/router";
 import CategoryMenu from "./CategoryMenu";
 import Link from "next/link";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
 import { useState } from "react";
 import { Favorite } from "@mui/icons-material";
+import useIsLoggedIn from "@/hooks/useIsLoggedIn";
+import {
+  CartBadge,
+  HeaderBox,
+  Logo,
+  MobileMenu,
+  SearchInputBox,
+} from "./HeaderStyles";
+import { useLogoutMutation } from "@/store/api/apiSlice";
 
 export default function Header() {
   const router = useRouter();
-  const isLoggedIn = false; // later from Redux/Auth
+  const isLoggedIn = useIsLoggedIn();
 
   const [query, setQuery] = useState("");
+  const [logout] = useLogoutMutation();
 
   const handleSearch = () => {
     if (!query.trim()) return;
@@ -33,35 +38,21 @@ export default function Header() {
   };
 
   return (
-    <AppBar position="sticky" color="inherit" elevation={1}>
+    <HeaderBox>
       <Toolbar sx={{ gap: 2 }}>
-        {/* Mobile menu */}
         <IconButton sx={{ display: { md: "none" } }}>
           <MenuIcon />
         </IconButton>
 
-        {/* Logo */}
-        <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
+        <Logo href="/">
           <Typography variant="h6">Shop Hub</Typography>
-        </Link>
-        {/* Category dropdown */}
-        <Box sx={{ display: { xs: "none", md: "block" } }}>
+        </Logo>
+        <MobileMenu>
           <CategoryMenu />
-        </Box>
+        </MobileMenu>
 
-        {/* Search */}
-        <Box
-          sx={{
-            flex: 1,
-            display: "flex",
-            alignItems: "center",
-            backgroundColor: "#F3F4F6",
-            px: 2,
-            py: 0.5,
-            borderRadius: 999,
-          }}
-        >
-          <SearchIcon sx={{ color: "text.secondary" }} />
+        <SearchInputBox>
+          <SearchIcon sx={{ color: "text.primary" }} />
           <TextField
             placeholder="Search products"
             value={query}
@@ -72,37 +63,45 @@ export default function Header() {
               "& fieldset": { border: "none" },
             }}
           />
-        </Box>
+        </SearchInputBox>
 
-        {/* Wishlist */}
         <Link href="/wishlist">
-          <IconButton>
-            <Favorite color="error" />
-          </IconButton>
+          <Favorite color="error" />
         </Link>
 
-        {/* Cart */}
-        <Badge badgeContent={2} color="primary">
+        <Badge badgeContent={2} color="primary" sx={{ top: "0px" }}>
           <Link href="/cart">
             <IconButton>🛒</IconButton>
           </Link>
         </Badge>
 
-        {/* Auth */}
-        {/* {!isLoggedIn ? ( */}
-        <>
-          <Button variant="text">Login</Button>
-          <Button variant="outlined">Register</Button>
-        </>
-        {/* ) : ( */}
-        <>
-          <Link href="/profile">
-            <IconButton>👤</IconButton>
-          </Link>
-          <Button>Logout</Button>
-        </>
-        {/* )} */}
+        {!isLoggedIn ? (
+          <>
+            <Link href="/auth/login">
+              <Button variant="text">Login</Button>
+            </Link>
+            <Link href="/auth/register">
+              <Button variant="outlined">Register</Button>
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link href="/profile">
+              <IconButton>👤</IconButton>
+            </Link>
+            <Button
+              onClick={() => {
+                logout({});
+                localStorage.clear();
+                router.push("/");
+                router.reload();
+              }}
+            >
+              Logout
+            </Button>
+          </>
+        )}
       </Toolbar>
-    </AppBar>
+    </HeaderBox>
   );
 }

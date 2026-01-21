@@ -14,7 +14,7 @@ export default function HomePage() {
   return (
     <>
       <Head>
-        <title>Shop Hub – Online Shopping</title>
+        <title>Shop Hub - Online Shopping</title>
         <meta name="description" content="Shop Hub home page" />
       </Head>
 

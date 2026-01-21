@@ -1,13 +1,50 @@
-import { Components } from '@mui/material/styles';
+import { Components } from "@mui/material/styles";
 
 export const components: Components = {
   MuiButton: {
+    defaultProps: {
+      disableRipple: true,
+      disableElevation: true,
+    },
     styleOverrides: {
       root: {
-        borderRadius: 999, // Pill shape
-        textTransform: 'none',
+        borderRadius: "50px",
+        textTransform: "none",
         fontWeight: 600,
-        padding: '8px 20px',
+        padding: "8px 20px",
+      },
+    },
+  },
+
+  MuiSelect: {
+    defaultProps: {
+      MenuProps: {
+        disableScrollLock: true,
+      },
+    },
+    styleOverrides: {
+      root: {
+        border: "none",
+        ":hover": {
+          border: "none",
+          outline: "none",
+        },
+        "& fieldset": {
+          border: "none",
+        },
+      },
+    },
+  },
+
+  MuiIconButton: {
+    defaultProps: {
+      disableRipple: true,
+    },
+    styleOverrides: {
+      root: {
+        ":hover": {
+          backgroundColor: "#6B728020",
+        },
       },
     },
   },
@@ -16,14 +53,21 @@ export const components: Components = {
     styleOverrides: {
       root: {
         borderRadius: 14,
-        boxShadow: '0 8px 24px rgba(0,0,0,0.04)',
+        boxShadow: "0 8px 24px rgba(0,0,0,0.04)",
       },
     },
   },
 
   MuiTextField: {
     defaultProps: {
-      size: 'small',
+      size: "small",
+    },
+  },
+  MuiTypography: {
+    styleOverrides: {
+      root: {
+        textTransform: "none",
+      },
     },
   },
 };

@@ -17,7 +17,8 @@ interface UserState {
     name: string;
     email: string;
     phone: string;
-    avatar?: string; // base64 / url
+    avatar?: string;
+    userId: string;
   };
   addresses: Address[];
   notificationsEnabled: boolean;
@@ -25,9 +26,10 @@ interface UserState {
 
 const initialState: UserState = {
   profile: {
-    name: "Guest User",
-    email: "guest@shophub.com",
-    phone: "9999999999",
+    name: "",
+    email: "",
+    phone: "",
+    userId: "",
   },
   addresses: [],
   notificationsEnabled: true,
@@ -44,18 +46,18 @@ const userSlice = createSlice({
       state.addresses.push(action.payload);
     },
     updateAddress(state, action: PayloadAction<Address>) {
-      state.addresses = state.addresses.map(a =>
-        a.id === action.payload.id ? action.payload : a
+      state.addresses = state.addresses.map((a) =>
+        a.id === action.payload.id ? action.payload : a,
       );
     },
     deleteAddress(state, action: PayloadAction<string>) {
-      state.addresses = state.addresses.filter(a => a.id !== action.payload);
+      state.addresses = state.addresses.filter((a) => a.id !== action.payload);
     },
     toggleNotifications(state) {
       state.notificationsEnabled = !state.notificationsEnabled;
     },
     logout(state) {
-      return initialState; // clears user data
+      return initialState;
     },
   },
 });

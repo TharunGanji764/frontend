@@ -6,18 +6,18 @@ import EditProfileModal from "@/components/molecules/Profile/EditProfileModal";
 
 export default function ProfileOverview() {
   const { profile, notificationsEnabled } = useSelector(
-    (state: RootState) => state.user
+    (state: RootState) => state.user,
   );
   const [open, setOpen] = useState(false);
 
   return (
     <Box>
-      <Avatar src={profile.avatar} sx={{ width: 80, height: 80 }} />
+      <Avatar src={profile?.avatar} sx={{ width: 80, height: 80 }} />
       <Typography variant="h6" sx={{ mt: 1 }}>
-        {profile.name}
+        {profile?.name}
       </Typography>
-      <Typography>{profile.email}</Typography>
-      <Typography>{profile.phone}</Typography>
+      <Typography>{profile?.email}</Typography>
+      <Typography>{profile?.phone}</Typography>
 
       <Button sx={{ mt: 2 }} variant="outlined" onClick={() => setOpen(true)}>
         Edit Profile

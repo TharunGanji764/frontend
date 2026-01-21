@@ -22,3 +22,19 @@ export default function LoginPage() {
     </>
   );
 }
+
+export const getServerSideProps = async (context: any) => {
+  const { req } = context;
+  const token = req?.cookies?.access_token;
+  console.log('token: ', token);
+  if (token) {
+    return {
+      redirect: {
+        destination: "/",
+      },
+    };
+  }
+  return {
+    props: {},
+  };
+};

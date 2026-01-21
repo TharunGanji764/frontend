@@ -1,39 +1,43 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import cartReducer from "./slices/cartSlice";
 import checkoutReducer from "./slices/checkoutSlice";
 import wishlistReducer from "./slices/wishlistSlice";
 import userReducer from "./slices/userSlice";
 import orderReducer from "./slices/orderSlice";
+import { apiSlice } from "./api/apiSlice";
+import toastReducer from "./slices/toastSlice";
+import storage from "redux-persist/lib/storage";
+import { persistReducer } from "redux-persist";
+import { persistStore } from "redux-persist";
 
-const loadState = () => {
-  try {
-    const serialized = localStorage.getItem("cart");
-    return serialized ? { cart: JSON.parse(serialized) } : undefined;
-  } catch {
-    return undefined;
-  }
+const persistConfig = {
+  key: "root",
+  storage,
+  whitelist: ["cart", "user"],
 };
 
-const saveState = (state: any) => {
-  try {
-    localStorage.setItem("cart", JSON.stringify(state.cart));
-  } catch {}
+const rootReducer = {
+  cart: cartReducer,
+  checkout: checkoutReducer,
+  wishlist: wishlistReducer,
+  user: userReducer,
+  orders: orderReducer,
+  [apiSlice.reducerPath]: apiSlice.reducer,
+  toast: toastReducer,
 };
+
+const persistedReducer = persistReducer(
+  persistConfig,
+  combineReducers(rootReducer),
+);
 
 export const store = configureStore({
-  reducer: {
-    cart: cartReducer,
-    checkout: checkoutReducer,
-    wishlist: wishlistReducer,
-    user: userReducer,
-    orders: orderReducer,
-  },
-  preloadedState: typeof window !== "undefined" ? loadState() : undefined,
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware: any) =>
+    getDefaultMiddleware().concat(apiSlice.middleware),
 });
 
-store.subscribe(() => {
-  saveState(store.getState());
-});
+export const persistor = persistStore(store);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
