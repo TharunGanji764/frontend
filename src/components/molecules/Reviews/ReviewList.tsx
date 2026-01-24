@@ -7,10 +7,10 @@ export default function ReviewList({ reviews }: any) {
         Write a Review
       </Button>
 
-      {reviews.map((r: any) => (
-        <Box key={r.id} sx={{ mb: 2 }}>
-          <Typography fontWeight={600}>{r.user}</Typography>
-          <Typography>{r.comment}</Typography>
+      {reviews?.map((review: any) => (
+        <Box key={review?.id} sx={{ mb: 2 }}>
+          <Typography fontWeight={600}>{review?.user}</Typography>
+          <Typography>{review?.comment}</Typography>
         </Box>
       ))}
     </Box>

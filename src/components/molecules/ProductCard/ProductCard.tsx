@@ -1,5 +1,4 @@
 import {
-  Card,
   CardMedia,
   CardContent,
   Typography,
@@ -22,6 +21,13 @@ import {
   updateQuantity,
   removeFromCart,
 } from "@/store/slices/cartSlice";
+import {
+  CartButtons,
+  CustomCardContent,
+  ProductCardContainer,
+  ProductInfoBox,
+} from "./styles";
+import { ColumnStack } from "@/components/commonStyles/styles";
 
 interface Props {
   product: any;
@@ -31,13 +37,13 @@ export default function ProductCard({ product }: Props) {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const cartItems = useSelector((s: RootState) => s.cart.items);
-  const wishlist = useSelector((s: RootState) => s.wishlist.items);
+  const cartItems = useSelector((s: RootState) => s?.cart?.items);
+  const wishlist = useSelector((s: RootState) => s?.wishlist?.items);
 
-  const cartItem = cartItems.find((i: any) => i.id === product.id);
+  const cartItem = cartItems?.find((i: any) => i?.id === product?.id);
   const quantity = cartItem?.quantity ?? 0;
 
-  const inWishlist = wishlist.some((i: any) => i.id === product.id);
+  const inWishlist = wishlist?.some((i: any) => i?.id === product?.id);
 
   const handleAddFirst = () => {
     dispatch(addToCart({ ...product, quantity: 1 }));
@@ -46,21 +52,21 @@ export default function ProductCard({ product }: Props) {
   const handleIncrease = () => {
     dispatch(
       updateQuantity({
-        id: product.id,
+        id: product?.id,
         quantity: quantity + 1,
-      })
+      }),
     );
   };
 
   const handleDecrease = () => {
     if (quantity === 1) {
-      dispatch(removeFromCart(product.id));
+      dispatch(removeFromCart(product?.id));
     } else {
       dispatch(
         updateQuantity({
-          id: product.id,
+          id: product?.id,
           quantity: quantity - 1,
-        })
+        }),
       );
     }
   };
@@ -73,69 +79,62 @@ export default function ProductCard({ product }: Props) {
   };
 
   return (
-    <Card sx={{ height: "100%", position: "relative" }}>
-      {/* Wishlist */}
+    <ProductCardContainer>
       <IconButton
         sx={{ position: "absolute", top: 8, right: 8 }}
         onClick={() =>
           inWishlist
-            ? dispatch(removeFromWishlist(product.id))
+            ? dispatch(removeFromWishlist(product?.sku))
             : dispatch(addToWishlist(product))
         }
       >
         {inWishlist ? <Favorite color="error" /> : <FavoriteBorderIcon />}
       </IconButton>
 
-      {/* Image */}
-      <Link href={`/product/${product.id}`} style={{ textDecoration: "none" }}>
+      <Link
+        href={`/product/${product?.sku}`}
+        style={{ textDecoration: "none" }}
+      >
         <CardMedia
           component="img"
-          height="180"
-          image={product.image}
+          image={product?.thumbnail}
           loading="lazy"
-          sx={{ cursor: "pointer" }}
+          sx={{
+            cursor: "pointer",
+            objectFit: "contain",
+            height: "180px",
+          }}
         />
       </Link>
 
-      <CardContent>
-        <Typography variant="body2">{product.title}</Typography>
+      <CustomCardContent>
+        <Typography variant="body2">{product?.title}</Typography>
 
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-          <Typography fontWeight={600}>₹{product.price}</Typography>
+        <ProductInfoBox>
+          <Typography fontWeight={600}>₹{product?.discounted_price}</Typography>
           <Typography
             variant="body2"
             sx={{ textDecoration: "line-through", color: "text.secondary" }}
           >
-            ₹{product.mrp}
+            ₹{product?.price}
           </Typography>
-          <Typography color="success.main">{product.discount}% off</Typography>
-        </Box>
+          <Typography color="success.main" variant="body2">
+            {product?.discount_percentage}% off
+          </Typography>
+        </ProductInfoBox>
 
-        {/* ADD / QTY CONTROLS */}
         {quantity === 0 ? (
           <Button
             fullWidth
             sx={{ mt: 1 }}
             variant="contained"
-            disabled={!product.inStock}
+            disabled={!product?.stock}
             onClick={handleAddFirst}
           >
             Add to Cart
           </Button>
         ) : (
-          <Box
-            sx={{
-              mt: 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              border: "1px solid",
-              borderColor: "divider",
-              borderRadius: 1,
-              px: 1,
-              height: 40,
-            }}
-          >
+          <CartButtons>
             <IconButton size="small" onClick={handleDecrease}>
               <Remove />
             </IconButton>
@@ -145,24 +144,23 @@ export default function ProductCard({ product }: Props) {
             <IconButton
               size="small"
               onClick={handleIncrease}
-              disabled={quantity >= product.stockQty}
+              disabled={quantity >= product?.stockQty}
             >
               <Add />
             </IconButton>
-          </Box>
+          </CartButtons>
         )}
 
-        {/* BUY NOW */}
         <Button
           fullWidth
           sx={{ mt: 1 }}
           variant="outlined"
-          disabled={!product.inStock}
+          disabled={!product.stock}
           onClick={handleBuyNow}
         >
           Buy Now
         </Button>
-      </CardContent>
-    </Card>
+      </CustomCardContent>
+    </ProductCardContainer>
   );
 }

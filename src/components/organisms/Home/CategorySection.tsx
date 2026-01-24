@@ -1,14 +1,11 @@
+import CapitalizeString from "@/utils/CapitalizeString";
 import { Box, Card, CardMedia, Typography } from "@mui/material";
-import products from "@/mock-data/product-details";
-import getCategories from "@/utils/getCategories";
 
-export default function CategorySection() {
-  const categories = getCategories(products);
-
+export default function CategorySection({ categories }: any) {
   return (
     <Box sx={{ display: "flex", gap: 2, overflowX: "auto" }}>
-      {categories?.map((cat) => (
-        <Card key={cat} sx={{ minWidth: 160, textAlign: "center" }}>
+      {categories?.map((category: any) => (
+        <Card key={category} sx={{ minWidth: 160, textAlign: "center" }}>
           <CardMedia
             component="img"
             height="120"
@@ -16,7 +13,7 @@ export default function CategorySection() {
             loading="lazy"
           />
           <Typography variant="body2" sx={{ p: 1 }}>
-            {cat}
+            {CapitalizeString(category)}
           </Typography>
         </Card>
       ))}

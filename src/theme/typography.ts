@@ -10,9 +10,9 @@ export const typography: TypographyOptions = {
   h5: { fontWeight: 600, fontSize: "1.1rem" },
   h6: { fontWeight: 600 },
 
-  body1: { fontSize: "0.95rem" },
-  body2: { fontSize: "0.875rem" },
+  body1: { fontSize: "0.833vw" },
+  body2: { fontSize: "0.729vw" },
 
-  link: { fontWeight: 500, fontSize: "0.875rem", textDecoration: "underline" },
-  button: { fontWeight: 600, fontSize: "0.875rem", textTransform: "uppercase" },
+  link: { fontWeight: 500, fontSize: "0.729vw", textDecoration: "underline" },
+  button: { fontWeight: 600, fontSize: "0.729vw", textTransform: "uppercase" },
 };

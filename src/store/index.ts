@@ -9,6 +9,7 @@ import toastReducer from "./slices/toastSlice";
 import storage from "redux-persist/lib/storage";
 import { persistReducer } from "redux-persist";
 import { persistStore } from "redux-persist";
+import categoriesReducer from "./slices/categorySlice";
 
 const persistConfig = {
   key: "root",
@@ -24,6 +25,7 @@ const rootReducer = {
   orders: orderReducer,
   [apiSlice.reducerPath]: apiSlice.reducer,
   toast: toastReducer,
+  categories: categoriesReducer,
 };
 
 const persistedReducer = persistReducer(

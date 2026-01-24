@@ -14,12 +14,12 @@ export default function ProductTabs({ product }: any) {
         <Tab label="Reviews" />
       </Tabs>
 
-      {tab === 0 && <Box sx={{ mt: 2 }}>{product.description}</Box>}
+      {tab === 0 && <Box sx={{ mt: 2 }}>{product?.description}</Box>}
       {tab === 1 && <Box sx={{ mt: 2 }}>{product.specifications}</Box>}
       {tab === 2 && (
         <Box sx={{ mt: 2 }}>
-          <RatingBreakdown ratings={product.ratingBreakdown} />
-          <ReviewList reviews={product.reviews} />
+          {/* <RatingBreakdown ratings={product.ratingBreakdown} /> */}
+          <ReviewList reviews={product?.reviews} />
         </Box>
       )}
     </Box>

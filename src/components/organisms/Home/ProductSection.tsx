@@ -1,5 +1,7 @@
 import { Grid, Typography, Box, Button } from "@mui/material";
 import ProductCard from "@/components/molecules/ProductCard/ProductCard";
+import { useState } from "react";
+import { ProductsContainer, ProductsSectionContainer } from "./Styles";
 
 interface Props {
   title: string;
@@ -7,20 +9,28 @@ interface Props {
 }
 
 export default function ProductSection({ title, products }: Props) {
-  return (
-    <Box sx={{ mt: 6 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-        <Typography variant="h5">{title}</Typography>
-        <Button size="small">View All</Button>
-      </Box>
+  const [showMaxCards, setShowMaxCards] = useState<number>(8);
 
-      <Grid container spacing={2}>
-        {products.map((p) => (
-          <Grid item xs={6} md={3} lg={2} key={p.id}>
+  const handleViewMoreClicked = () => {
+    setShowMaxCards((prev) => prev + 4);
+  };
+  return (
+    <ProductsSectionContainer>
+      <Typography variant="h5">{title}</Typography>
+      <ProductsContainer container>
+        {products?.slice(0, showMaxCards)?.map((p) => (
+          <Grid item key={p?.id} >
             <ProductCard product={p} />
           </Grid>
         ))}
-      </Grid>
-    </Box>
+      </ProductsContainer>
+      <Button
+        size="small"
+        sx={{ margin: "0vw auto" }}
+        onClick={handleViewMoreClicked}
+      >
+        View More
+      </Button>
+    </ProductsSectionContainer>
   );
 }

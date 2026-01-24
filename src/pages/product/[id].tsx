@@ -5,42 +5,49 @@ import ProductGallery from "@/components/organisms/Product/ProductGallery";
 import ProductInfo from "@/components/organisms/Product/ProductInfo";
 import ProductTabs from "@/components/organisms/Product/ProductTabs";
 import RelatedProducts from "@/components/organisms/Product/RelatedProducts";
-import products from "@/mock-data/product-details";
 
-export default function ProductDetailsPage() {
-  const { query } = useRouter();
-  const id = Number(query.id);
-
-  const product = products.find((p) => p.id === id);
-
-  if (!product) {
+export default function ProductDetailsPage({ productData }: any) {
+  if (!productData) {
     return <Skeleton variant="rectangular" height={400} />;
   }
 
   return (
     <>
       <Head>
-        <title>{product.title} | Shop Hub</title>
-        <meta name="description" content={product.shortDescription} />
+        <title>{productData?.title} | Shop Hub</title>
+        <meta name="description" content={productData?.description} />
       </Head>
 
-      <Box sx={{ mt: 4 }}>
-        <Grid container spacing={4}>
-          {/* Images */}
-          <Grid item xs={12} md={6}>
-            <ProductGallery images={product.images} />
+      <Box sx={{ py: 4 }}>
+        <Grid container spacing={4} alignItems="flex-start">
+          <Grid item xs={12} md={4}>
+            <ProductGallery images={productData?.images} />
           </Grid>
 
-          {/* Info */}
-          <Grid item xs={12} md={6}>
-            <ProductInfo product={product} />
+          <Grid item xs={12} md={7}>
+            <ProductInfo product={productData} />
           </Grid>
         </Grid>
 
-        <ProductTabs product={product} />
-
-        <RelatedProducts products={product.relatedProducts} />
+        <Box sx={{ mt: 6 }}>
+          <ProductTabs product={productData} />
+        </Box>
+        {/* <Box sx={{ mt: 6 }}>
+          <RelatedProducts products={product.relatedProducts} />
+        </Box> */}
       </Box>
     </>
   );
+}
+
+export async function getServerSideProps(context: any) {
+  const { query } = context;
+  const productDataUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_PRODUCTS_ENDPOINT}/${query?.id}`;
+  const response = await fetch(productDataUrl);
+  const productDataResult = await response?.json();
+  return {
+    props: {
+      productData: productDataResult,
+    },
+  };
 }

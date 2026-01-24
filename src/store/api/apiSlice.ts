@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithAuth } from "./baseQuery";
 import { updateProfile } from "../slices/userSlice";
+import { addCategories } from "../slices/categorySlice";
 
 export const apiSlice = createApi({
   reducerPath: "api",
@@ -41,7 +42,22 @@ export const apiSlice = createApi({
         method: "POST",
       }),
     }),
+
+    getCategories: builder.query<any, void>({
+      query: () => ({
+        url: process.env.NEXT_PUBLIC_API_CATEGORIES_ENDPOINT,
+        method: "GET",
+      }),
+
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(addCategories(data));
+        } catch (err) {}
+      },
+    }),
   }),
 });
 
-export const { useLoginMutation, useLogoutMutation } = apiSlice;
+export const { useLoginMutation, useLogoutMutation, useGetCategoriesQuery } =
+  apiSlice;

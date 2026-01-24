@@ -24,10 +24,13 @@ import {
   SearchInputBox,
 } from "./HeaderStyles";
 import { useLogoutMutation } from "@/store/api/apiSlice";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 export default function Header() {
   const router = useRouter();
   const isLoggedIn = useIsLoggedIn();
+  const cartItems = useSelector((state: RootState) => state.cart.items);
 
   const [query, setQuery] = useState("");
   const [logout] = useLogoutMutation();
@@ -39,7 +42,7 @@ export default function Header() {
 
   return (
     <HeaderBox>
-      <Toolbar sx={{ gap: 2 }}>
+      <Toolbar sx={{ gap: 2, alignItems: "center" }}>
         <IconButton sx={{ display: { md: "none" } }}>
           <MenuIcon />
         </IconButton>
@@ -66,10 +69,14 @@ export default function Header() {
         </SearchInputBox>
 
         <Link href="/wishlist">
-          <Favorite color="error" />
+          <Favorite color="error" sx={{ height: "40px", marginTop: "12px" }} />
         </Link>
 
-        <Badge badgeContent={2} color="primary" sx={{ top: "0px" }}>
+        <Badge
+          badgeContent={cartItems?.length}
+          color="primary"
+          sx={{ top: "0px" }}
+        >
           <Link href="/cart">
             <IconButton>🛒</IconButton>
           </Link>

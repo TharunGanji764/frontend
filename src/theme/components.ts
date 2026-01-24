@@ -8,10 +8,19 @@ export const components: Components = {
     },
     styleOverrides: {
       root: {
-        borderRadius: "50px",
+        borderRadius: "2.604vw",
         textTransform: "none",
         fontWeight: 600,
-        padding: "8px 20px",
+        padding: "0.417vw 1.042vw",
+      },
+    },
+  },
+
+  MuiGrid: {
+    styleOverrides: {
+      root: {
+        columnGap: "18px",
+        rowGap: "18px",
       },
     },
   },
