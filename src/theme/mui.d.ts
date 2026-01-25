@@ -48,6 +48,13 @@ declare module "@mui/material/Button" {
     primary: true;
     secondary: true;
     link: true;
+    // "primary-s": true;
+    // "secondary-s": true;
+    "dark-outlined": true;
+    "dark-contained": true;
+    "light-outlined": true;
+    "default-button": true;
+    "light-contained": true;
   }
 }
 
@@ -120,6 +127,13 @@ declare module "@mui/material/styles" {
     link?: SxProps<Theme>;
 
     gradient?: SxProps<Theme>;
+    // "primary-s": true;
+    // "secondary-s": true;
+    "dark-outlined": false;
+    "dark-contained": false;
+    "light-outlined": false;
+    "default-button": false;
+    "light-contained": false;
   }
 
   interface TypographyVariants {

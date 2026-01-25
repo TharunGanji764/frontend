@@ -23,17 +23,32 @@ import {
   MobileMenu,
   SearchInputBox,
 } from "./HeaderStyles";
-import { useLogoutMutation } from "@/store/api/apiSlice";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+import {
+  apiSlice,
+  useGetCartQuery,
+  useLogoutMutation,
+} from "@/store/api/apiSlice";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store";
 
 export default function Header() {
   const router = useRouter();
   const isLoggedIn = useIsLoggedIn();
-  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const dispatch = useDispatch<AppDispatch>();
 
   const [query, setQuery] = useState("");
   const [logout] = useLogoutMutation();
+
+  const { cartCount } = useGetCartQuery(undefined, {
+    skip: !isLoggedIn,
+    selectFromResult: ({ data }) => ({
+      cartCount:
+        data?.items?.reduce(
+          (total: number, item: any) => total + item.quantity,
+          0,
+        ) ?? 0,
+    }),
+  });
 
   const handleSearch = () => {
     if (!query.trim()) return;
@@ -72,11 +87,7 @@ export default function Header() {
           <Favorite color="error" sx={{ height: "40px", marginTop: "12px" }} />
         </Link>
 
-        <Badge
-          badgeContent={cartItems?.length}
-          color="primary"
-          sx={{ top: "0px" }}
-        >
+        <Badge badgeContent={cartCount} color="primary" sx={{ top: "0px" }}>
           <Link href="/cart">
             <IconButton>🛒</IconButton>
           </Link>
@@ -97,9 +108,11 @@ export default function Header() {
               <IconButton>👤</IconButton>
             </Link>
             <Button
+              variant="secondary"
               onClick={() => {
                 logout({});
                 localStorage.clear();
+                dispatch(apiSlice.util.resetApiState());
                 router.push("/");
                 router.reload();
               }}

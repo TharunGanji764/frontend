@@ -1,11 +1,4 @@
-import {
-  CardMedia,
-  CardContent,
-  Typography,
-  Box,
-  IconButton,
-  Button,
-} from "@mui/material";
+import { CardMedia, Typography, IconButton, Button } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { Favorite, Add, Remove } from "@mui/icons-material";
 import Link from "next/link";
@@ -16,18 +9,20 @@ import {
   addToWishlist,
   removeFromWishlist,
 } from "@/store/slices/wishlistSlice";
-import {
-  addToCart,
-  updateQuantity,
-  removeFromCart,
-} from "@/store/slices/cartSlice";
+import { addItemToCart } from "@/store/slices/cartSlice";
 import {
   CartButtons,
   CustomCardContent,
   ProductCardContainer,
   ProductInfoBox,
 } from "./styles";
-import { ColumnStack } from "@/components/commonStyles/styles";
+import {
+  useAddToCartMutation,
+  useGetCartQuery,
+  useRemoveFromCartMutation,
+  useUpdateCartMutation,
+} from "@/store/api/apiSlice";
+import { showToast } from "@/store/slices/toastSlice";
 
 interface Props {
   product: any;
@@ -36,44 +31,87 @@ interface Props {
 export default function ProductCard({ product }: Props) {
   const dispatch = useDispatch();
   const router = useRouter();
-
-  const cartItems = useSelector((s: RootState) => s?.cart?.items);
+  const { data: cart } = useGetCartQuery();
   const wishlist = useSelector((s: RootState) => s?.wishlist?.items);
 
-  const cartItem = cartItems?.find((i: any) => i?.id === product?.id);
+  const cartItem = cart?.items?.find(
+    (item: any) => item?.product_id === product?.sku,
+  );
   const quantity = cartItem?.quantity ?? 0;
 
   const inWishlist = wishlist?.some((i: any) => i?.id === product?.id);
 
-  const handleAddFirst = () => {
-    dispatch(addToCart({ ...product, quantity: 1 }));
-  };
+  const [addToCart] = useAddToCartMutation();
+  const [updateQuantity] = useUpdateCartMutation();
+  const [removeFromCart] = useRemoveFromCartMutation();
 
-  const handleIncrease = () => {
-    dispatch(
-      updateQuantity({
-        id: product?.id,
-        quantity: quantity + 1,
-      }),
-    );
-  };
-
-  const handleDecrease = () => {
-    if (quantity === 1) {
-      dispatch(removeFromCart(product?.id));
-    } else {
+  const handleAddFirst = async () => {
+    try {
+      await addToCart({
+        product_id: product?.sku,
+        quantity: 1,
+      });
       dispatch(
-        updateQuantity({
-          id: product?.id,
-          quantity: quantity - 1,
+        showToast({
+          message: "Item added to cart successfully",
+          severity: "success",
+        }),
+      );
+    } catch (err) {
+      dispatch(
+        showToast({
+          message: err as any,
+          severity: "error",
         }),
       );
     }
   };
 
+  const handleIncrease = async (action: string) => {
+    const response = await updateQuantity({
+      productId: product?.sku,
+      action,
+    });
+    if (response?.data?.item) {
+      dispatch(
+        showToast({
+          message: "Quantity Updated",
+          severity: "success",
+        }),
+      );
+    }
+  };
+
+  const handleDecrease = async (action: string) => {
+    if (quantity === 1) {
+      const response = await removeFromCart({ productId: product?.sku });
+      if (response) {
+        dispatch(
+          showToast({
+            message: "Item removed from cart ",
+            severity: "success",
+          }),
+        );
+      }
+    } else {
+      const response = await updateQuantity({
+        productId: product?.sku,
+        action,
+      });
+      if (response?.data?.item) {
+        dispatch(
+          showToast({
+            message: "Quantity Updated",
+            severity: "success",
+          }),
+        );
+      }
+    }
+  };
+
   const handleBuyNow = () => {
     if (!cartItem) {
-      dispatch(addToCart({ ...product, quantity: 1 }));
+      dispatch(addItemToCart({ ...product, quantity: 1 }));
     }
     router.push("/checkout");
   };
@@ -127,7 +165,7 @@ export default function ProductCard({ product }: Props) {
           <Button
             fullWidth
             sx={{ mt: 1 }}
-            variant="contained"
+            variant="primary"
             disabled={!product?.stock}
             onClick={handleAddFirst}
           >
@@ -135,7 +173,10 @@ export default function ProductCard({ product }: Props) {
           </Button>
         ) : (
           <CartButtons>
-            <IconButton size="small" onClick={handleDecrease}>
+            <IconButton
+              size="small"
+              onClick={() => handleDecrease("Decrement")}
+            >
               <Remove />
             </IconButton>
 
@@ -143,7 +184,7 @@ export default function ProductCard({ product }: Props) {
 
             <IconButton
               size="small"
-              onClick={handleIncrease}
+              onClick={() => handleIncrease("Increment")}
               disabled={quantity >= product?.stockQty}
             >
               <Add />
@@ -154,7 +195,7 @@ export default function ProductCard({ product }: Props) {
         <Button
           fullWidth
           sx={{ mt: 1 }}
-          variant="outlined"
+          variant="secondary"
           disabled={!product.stock}
           onClick={handleBuyNow}
         >

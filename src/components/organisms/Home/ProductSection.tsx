@@ -6,31 +6,50 @@ import { ProductsContainer, ProductsSectionContainer } from "./Styles";
 interface Props {
   title: string;
   products: any[];
+  getProducts?: (args: { page: number; limit: number }) => void;
 }
 
-export default function ProductSection({ title, products }: Props) {
-  const [showMaxCards, setShowMaxCards] = useState<number>(8);
+export default function ProductSection({
+  title,
+  products,
+  getProducts,
+}: Props) {
+  const [page, setPage] = useState(2);
+  const limit = 4;
+  const [noData, setNoData] = useState(false);
 
-  const handleViewMoreClicked = () => {
-    setShowMaxCards((prev) => prev + 4);
+  const handleViewMoreClicked = async () => {
+    setPage((page) => page + 1);
+    if (getProducts) {
+      const response = await getProducts({
+        page,
+        limit,
+      });
+      if ((response as any)?.data?.data?.length === 0) {
+        setNoData(true);
+      }
+    }
   };
   return (
     <ProductsSectionContainer>
       <Typography variant="h5">{title}</Typography>
       <ProductsContainer container>
-        {products?.slice(0, showMaxCards)?.map((p) => (
-          <Grid item key={p?.id} >
+        {products?.map((p) => (
+          <Grid item key={p?.id}>
             <ProductCard product={p} />
           </Grid>
         ))}
       </ProductsContainer>
-      <Button
-        size="small"
-        sx={{ margin: "0vw auto" }}
-        onClick={handleViewMoreClicked}
-      >
-        View More
-      </Button>
+      {!noData && (
+        <Button
+          size="small"
+          sx={{ margin: "0vw auto" }}
+          onClick={handleViewMoreClicked}
+          variant="link"
+        >
+          View More
+        </Button>
+      )}
     </ProductsSectionContainer>
   );
 }

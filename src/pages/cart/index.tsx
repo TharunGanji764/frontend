@@ -1,16 +1,48 @@
 import Head from "next/head";
-import { Box, Typography, Grid, Button, IconButton } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+import {
+  Box,
+  Typography,
+  Grid,
+  Button,
+  IconButton,
+  Divider,
+  Breadcrumbs,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { removeFromCart, updateQuantity } from "@/store/slices/cartSlice";
+import {
+  useGetCartQuery,
+  useRemoveFromCartMutation,
+  useUpdateCartMutation,
+} from "@/store/api/apiSlice";
+import {
+  ButtonBox,
+  ButtonsContainer,
+  CartContainer,
+  CartItemBox,
+  InfoBox,
+  SummaryBox,
+} from "./styles";
+import Image from "next/image";
+import CartSummary from "@/components/organisms/Cart/CartSummary";
 
 export default function CartPage() {
-  const dispatch = useDispatch();
-  const items = useSelector((s: RootState) => s.cart.items);
+  const { data: cart } = useGetCartQuery();
 
-  const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const subtotal = cart?.items?.reduce(
+    (sum: any, i: any) => sum + i?.price * i?.quantity,
+    0,
+  );
+
+  const [updateQuantity] = useUpdateCartMutation();
+  const [removeFromCart] = useRemoveFromCartMutation();
+
+  const handleUpdateQuantity = async (action: string, id: string) => {
+    await updateQuantity({ productId: id, action });
+  };
 
   return (
     <>
@@ -19,108 +51,103 @@ export default function CartPage() {
         <meta name="description" content="Your shopping cart" />
       </Head>
 
-      <Typography variant="h4" sx={{ mb: 3 }}>
-        Shopping Cart
-      </Typography>
-
-      {items.length === 0 ? (
-        <Box textAlign="center" sx={{ mt: 6 }}>
-          <Typography>Your cart is empty</Typography>
-          <Link href="/">
-            <Button sx={{ mt: 2 }} variant="contained">
-              Continue Shopping
-            </Button>
-          </Link>
+      <CartContainer>
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h4" fontWeight={700} sx={{ mb: 0.5 }}>
+            Shopping Cart ({cart?.items?.length || 0} items)
+          </Typography>
+          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
+            <Link href="/" style={{ textDecoration: "none" }}>
+              <Typography variant="body2" color="text.secondary">
+                Home
+              </Typography>
+            </Link>
+            <Typography variant="body2" color="text.primary">
+              Cart
+            </Typography>
+          </Breadcrumbs>
         </Box>
-      ) : (
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={8}>
-            {items.map((item) => (
-              <Box
-                key={item.id}
-                sx={{
-                  display: "flex",
-                  gap: 2,
-                  mb: 2,
-                  borderBottom: "1px solid #eee",
-                  pb: 2,
-                }}
-              >
-                <img src={item?.thumbnail} width={100} alt={item.title} />
 
-                <Box sx={{ flex: 1 }}>
-                  <Typography fontWeight={600}>{item.title}</Typography>
-                  <Typography>₹{item.price}</Typography>
+        {!cart || cart?.items?.length === 0 ? (
+          <Box textAlign="center" sx={{ mt: 8 }}>
+            <Typography variant="h6">Your cart is empty</Typography>
+            <Link href="/" passHref>
+              <Button sx={{ mt: 2, borderRadius: 2 }} variant="contained">
+                Continue Shopping
+              </Button>
+            </Link>
+          </Box>
+        ) : (
+          <Grid container spacing={0}>
+            <Grid item xs={12} md={7}>
+              {cart?.items?.map((item: any) => (
+                <CartItemBox key={item?.id || item?.product_id}>
+                  <Image
+                    src={item?.thumbnail || item?.product_image}
+                    width={120}
+                    height={120}
+                    alt={item?.title || item?.product_name}
+                    style={{ objectFit: "contain", marginRight: "0.625vw" }}
+                  />
 
-                  <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-                    <Button
-                      size="small"
-                      onClick={() =>
-                        dispatch(
-                          updateQuantity({
-                            id: item.id,
-                            quantity: Math.max(1, item.quantity - 1),
-                          })
-                        )
-                      }
+                  <Box sx={{ flex: 1 }}>
+                    <Typography
+                      variant="body2"
+                      fontWeight={500}
+                      color="text.secondary"
                     >
-                      -
-                    </Button>
+                      {item?.title || item?.product_name}
+                    </Typography>
+                    <Typography variant="h6" fontWeight={700} sx={{ my: 0.5 }}>
+                      ₹{item.price}
+                    </Typography>
 
-                    <Typography sx={{ mx: 1 }}>{item.quantity}</Typography>
+                    <ButtonsContainer>
+                      <ButtonBox>
+                        <Button
+                          size="small"
+                          sx={{ minWidth: 36, color: "#000" }}
+                          onClick={() =>
+                            handleUpdateQuantity("Decrement", item?.product_id)
+                          }
+                        >
+                          -
+                        </Button>
+                        <Typography sx={{ mx: 1, fontWeight: 600 }}>
+                          {item?.quantity}
+                        </Typography>
+                        <Button
+                          size="small"
+                          sx={{ minWidth: 36, color: "#000" }}
+                          disabled={item?.quantity >= item?.stockQty}
+                          onClick={() =>
+                            handleUpdateQuantity("Increment", item?.product_id)
+                          }
+                        >
+                          +
+                        </Button>
+                      </ButtonBox>
 
-                    <Button
-                      size="small"
-                      disabled={item.quantity >= item?.stockQty}
-                      onClick={() =>
-                        dispatch(
-                          updateQuantity({
-                            id: item.id,
-                            quantity: item.quantity + 1,
-                          })
-                        )
-                      }
-                    >
-                      +
-                    </Button>
-
-                    <IconButton
-                      onClick={() => dispatch(removeFromCart(item.id))}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() =>
+                          removeFromCart({ productId: item?.product_id })
+                        }
+                      >
+                        <DeleteIcon fontSize="small" color="error" />
+                      </IconButton>
+                    </ButtonsContainer>
                   </Box>
-                </Box>
-              </Box>
-            ))}
-          </Grid>
+                </CartItemBox>
+              ))}
+            </Grid>
 
-          <Grid item xs={12} md={4}>
-            <Box
-              sx={{
-                border: "1px solid #eee",
-                p: 2,
-                position: "sticky",
-                top: 80,
-              }}
-            >
-              <Typography variant="h6">Summary</Typography>
-              <Typography>Subtotal: ₹{subtotal}</Typography>
-
-              <Link href="/checkout">
-                <Button
-                  variant="contained"
-                  fullWidth
-                  sx={{ mt: 2 }}
-                  disabled={items.length === 0}
-                >
-                  Proceed to Checkout
-                </Button>
-              </Link>
-            </Box>
+            <Grid item xs={12} md={4}>
+              <CartSummary items={cart?.items} />
+            </Grid>
           </Grid>
-        </Grid>
-      )}
+        )}
+      </CartContainer>
     </>
   );
 }

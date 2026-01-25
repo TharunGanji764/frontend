@@ -2,13 +2,36 @@ import { Box, Typography, Button, Chip, IconButton } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store";
-import { addToCart } from "@/store/slices/cartSlice";
+import { useAddToCartMutation } from "@/store/api/apiSlice";
+import { showToast } from "@/store/slices/toastSlice";
 
 export default function ProductInfo({ product }: any) {
   const dispatch = useDispatch<AppDispatch>();
+  const [addToCart] = useAddToCartMutation();
 
-  const handleAddToCart = (product: any) => {
-    dispatch(addToCart({ ...product, quantity: 1 }));
+  const handleAddToCart = async (product: any) => {
+    try {
+      const response = await addToCart({
+        product_id: product?.sku,
+        quantity: 1,
+      }).unwrap();
+
+      if (response?.data) {
+        dispatch(
+          showToast({
+            message: "Product added to cart",
+            severity: "success",
+          }),
+        );
+      }
+    } catch (err: any) {
+      dispatch(
+        showToast({
+          message: err?.data?.message || "Login failed",
+          severity: "error",
+        }),
+      );
+    }
   };
 
   return (

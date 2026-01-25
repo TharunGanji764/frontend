@@ -1,7 +1,9 @@
 import { Components } from "@mui/material/styles";
+import SHOPHUB_BUTTON_THEME from "./components/button";
 
 export const components: Components = {
   MuiButton: {
+    variants: SHOPHUB_BUTTON_THEME.variants,
     defaultProps: {
       disableRipple: true,
       disableElevation: true,
@@ -12,6 +14,7 @@ export const components: Components = {
         textTransform: "none",
         fontWeight: 600,
         padding: "0.417vw 1.042vw",
+        ...SHOPHUB_BUTTON_THEME.root,
       },
     },
   },

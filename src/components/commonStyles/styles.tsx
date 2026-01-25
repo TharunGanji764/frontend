@@ -10,7 +10,7 @@ export const ColumnStack = styled(Stack)({
 
 export const CommonCarouselStyles = styled(Box)`
   & .slick-dots {
-    bottom: 1.5vw;
+    bottom: 0.5vw;
     position: relative;
     line-height: 0vw;
   }
@@ -35,7 +35,7 @@ export const CommonCarouselStyles = styled(Box)`
     opacity: 1;
     width: 0.6vw;
     height: 0.6vw;
-    background: #ad8b3a;
+    background: #111827;
     border-radius: 15px;
   }
   & .slick-next {

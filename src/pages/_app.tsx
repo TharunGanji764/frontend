@@ -39,7 +39,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <ThemeProvider>
           <MainLayout>
             <Loader loading={loading} />
-            <Component {...pageProps} />
+            {!loading && <Component {...pageProps} />}
             <AppSnackbar />
           </MainLayout>
         </ThemeProvider>
