@@ -18,7 +18,7 @@ export default function EditProfileModal({ open, onClose }: any) {
         email: data.get("email") as string,
         phone: data.get("phone") as string,
         avatar,
-      })
+      }),
     );
     onClose();
   };
@@ -47,7 +47,7 @@ export default function EditProfileModal({ open, onClose }: any) {
           sx={{ mt: 2 }}
         />
 
-        <Button component="label" sx={{ mt: 2 }}>
+        <Button component="label" sx={{ mt: 2 }} variant="text">
           Upload Avatar
           <input
             type="file"

@@ -125,7 +125,7 @@ export const SHOPHUB_EXTENDED_BUTTONS = [
   {
     props: { variant: TEXT },
     style: {
-      color: "#502C8E",
+      color: "#111827",
       fontWeight: 700,
       background: "transparent",
       borderRadius: "1.458vw",
@@ -133,7 +133,7 @@ export const SHOPHUB_EXTENDED_BUTTONS = [
         background: "transparent",
       },
       "&.Mui-disabled": {
-        color: "#B9ABD2",
+        color: "#6B7280",
       },
     },
   },

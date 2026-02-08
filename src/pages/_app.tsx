@@ -37,11 +37,13 @@ export default function App({ Component, pageProps }: AppProps) {
     <PersistGate loading={null} persistor={persistor}>
       <Provider store={store}>
         <ThemeProvider>
-          <MainLayout>
-            <Loader loading={loading} />
-            {!loading && <Component {...pageProps} />}
-            <AppSnackbar />
-          </MainLayout>
+          <Loader loading={loading} />
+          {!loading && (
+            <MainLayout>
+              <Component {...pageProps} />
+              <AppSnackbar />
+            </MainLayout>
+          )}
         </ThemeProvider>
       </Provider>
     </PersistGate>

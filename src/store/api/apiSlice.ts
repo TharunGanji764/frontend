@@ -38,10 +38,11 @@ export const apiSlice = createApi({
       }),
     }),
 
-    logout: builder.mutation({
-      query: () => ({
+    logout: builder.mutation<any, { userId: string; sessionId: string }>({
+      query: (body) => ({
         url: process.env.NEXT_PUBLIC_API_LOGOUT_ENDPOINT,
         method: "POST",
+        body,
       }),
     }),
 
@@ -101,6 +102,23 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Cart"],
     }),
+    getAddress: builder.query<any, void>({
+      query: () => ({
+        url: `${process.env.NEXT_PUBLIC_API_ADDRESS_ENDPOINT}`,
+        method: "GET",
+      }),
+    }),
+    createOrder: builder.mutation<
+      any,
+      { shippingAddressId: any; headers: any }
+    >({
+      query: ({ headers, ...body }) => ({
+        url: `${process.env.NEXT_PUBLIC_API_CREATE_ORDER_ENDPOINT}`,
+        method: "POST",
+        headers,
+        body,
+      }),
+    }),
   }),
 });
 
@@ -113,4 +131,6 @@ export const {
   useGetCartQuery,
   useUpdateCartMutation,
   useRemoveFromCartMutation,
+  useGetAddressQuery,
+  useCreateOrderMutation,
 } = apiSlice;

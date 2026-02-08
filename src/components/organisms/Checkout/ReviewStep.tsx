@@ -1,55 +1,77 @@
-import { Box, Typography, Button, Dialog } from "@mui/material";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/store";
-import { clearCart } from "@/store/slices/cartSlice";
-import { clearCheckout } from "@/store/slices/checkoutSlice";
-import { useState } from "react";
-import { useRouter } from "next/router";
+import { Box, Typography, Button, Divider } from "@mui/material";
 
-export default function ReviewStep() {
-  const { address, paymentMethod } = useSelector(
-    (state: RootState) => state.checkout
-  );
-  const cart = useSelector((state: RootState) => state.cart.items);
-  const dispatch = useDispatch();
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-
-  const placeOrder = () => {
-    dispatch(clearCart());
-    dispatch(clearCheckout());
-    router.push("/order-success");
-  };
-
+export default function ReviewStep({
+  cartItems,
+  subtotal,
+  address,
+  onPlaceOrder,
+}: any) {
   return (
     <Box>
-      <Typography variant="h6">Address</Typography>
-      <Typography>{address?.fullName}</Typography>
+      <Typography variant="h6">Review Order</Typography>
 
-      <Typography variant="h6" sx={{ mt: 2 }}>
-        Payment
-      </Typography>
-      <Typography>{paymentMethod}</Typography>
+      <Divider sx={{ my: 2 }} />
 
-      <Typography variant="h6" sx={{ mt: 2 }}>
-        Items
+      <Typography>
+        <b>Address</b>
       </Typography>
-      {cart.map((i) => (
-        <Typography key={i.id}>
-          {i.title} × {i.quantity}
-        </Typography>
+      <Typography>{address?.address_line}</Typography>
+      <Typography>
+        {address?.city}, {address?.state} - {address?.pincode}
+      </Typography>
+
+      <Divider sx={{ my: 2 }} />
+
+      <Typography>
+        <b>Items</b>
+      </Typography>
+      {cartItems?.map((item: any) => (
+        <Box
+          key={item?.id}
+          sx={{ mb: 2, p: 2, border: "1px solid #ddd", borderRadius: 2 }}
+        >
+          <Typography variant="h6">
+            {item?.product_name} (x{item?.quantity})
+          </Typography>
+
+          {item?.product_image && (
+            <Box
+              component="img"
+              src={item.product_image}
+              alt={item.product_name}
+              sx={{ width: 100, height: 100, objectFit: "cover", my: 1 }}
+            />
+          )}
+
+          <Typography variant="body2" color="text.secondary">
+            <strong>Price:</strong> ${item?.price}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            <strong>SKU/Product ID:</strong> {item?.product_id}
+          </Typography>
+          <Typography
+            variant="body2"
+            display="block"
+            sx={{ mt: 1, color: "gray" }}
+          >
+            ID: {item?.id}
+          </Typography>
+        </Box>
       ))}
 
-      <Button variant="contained" sx={{ mt: 3 }} onClick={() => setOpen(true)}>
-        Place Order
-      </Button>
+      <Divider sx={{ my: 2 }} />
+      <Typography>
+        <b>Total</b>: ₹{subtotal}
+      </Typography>
 
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <Box sx={{ p: 3 }}>
-          <Typography>Confirm order?</Typography>
-          <Button onClick={placeOrder}>Yes</Button>
-        </Box>
-      </Dialog>
+      <Button
+        sx={{ mt: 3 }}
+        variant="contained"
+        fullWidth
+        onClick={onPlaceOrder}
+      >
+        Place Order & Pay
+      </Button>
     </Box>
   );
 }

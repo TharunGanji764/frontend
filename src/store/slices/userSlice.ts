@@ -18,7 +18,7 @@ interface UserState {
     email: string;
     phone: string;
     avatar?: string;
-    userId: string;
+    userId?: string;
   };
   addresses: Address[];
   notificationsEnabled: boolean;

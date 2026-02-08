@@ -35,6 +35,12 @@ export default function Header() {
   const router = useRouter();
   const isLoggedIn = useIsLoggedIn();
   const dispatch = useDispatch<AppDispatch>();
+  const sessionId = JSON.parse(
+    global?.window?.localStorage?.getItem("userData") || "{}",
+  )?.sessionId;
+  const userId = JSON.parse(
+    global?.window?.localStorage?.getItem("userData") || "{}",
+  )?.userId;
 
   const [query, setQuery] = useState("");
   const [logout] = useLogoutMutation();
@@ -49,6 +55,13 @@ export default function Header() {
         ) ?? 0,
     }),
   });
+
+  const handleLogout = async () => {
+    await logout({ userId, sessionId });
+    localStorage.clear();
+    dispatch(apiSlice.util.resetApiState());
+    router.push("/");
+  };
 
   const handleSearch = () => {
     if (!query.trim()) return;
@@ -107,16 +120,7 @@ export default function Header() {
             <Link href="/profile">
               <IconButton>👤</IconButton>
             </Link>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                logout({});
-                localStorage.clear();
-                dispatch(apiSlice.util.resetApiState());
-                router.push("/");
-                router.reload();
-              }}
-            >
+            <Button variant="secondary" onClick={handleLogout}>
               Logout
             </Button>
           </>

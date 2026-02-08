@@ -2,6 +2,7 @@ import { Box, Stack, styled } from "@mui/material";
 
 export const RowStack = styled(Stack)({
   flexDirection: "row",
+  alignItems: "center",
 });
 
 export const ColumnStack = styled(Stack)({

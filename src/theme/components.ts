@@ -82,4 +82,21 @@ export const components: Components = {
       },
     },
   },
+  // MuiCssBaseline: {
+  //   styleOverrides: `
+  //       ::-webkit-scrollbar {
+  //         width: 8px;
+  //       }
+  //       ::-webkit-scrollbar-track {
+  //         background: transparent;
+  //       }
+  //       ::-webkit-scrollbar-thumb {
+  //         background-color: black;
+  //         border-radius: 20px;
+  //         border: 2px solid transparent;
+  //         background-clip: content-box;
+  //         width: 2px;
+  //       }
+  //     `,
+  // },
 };

@@ -1,33 +1,32 @@
-import { Box, RadioGroup, FormControlLabel, Radio, Button } from "@mui/material";
-import { useDispatch } from "react-redux";
-import { setPaymentMethod } from "@/store/slices/checkoutSlice";
-import { useState } from "react";
+import { Box, Button, Typography } from "@mui/material";
 
-export default function PaymentStep({ onNext }: any) {
-  const [method, setMethod] = useState("");
-  const dispatch = useDispatch();
-
-  const handleContinue = () => {
-    dispatch(setPaymentMethod(method));
-    onNext();
-  };
-
+export default function PaymentStep({ paymentMethod, onSelect, onNext }: any) {
   return (
     <Box>
-      <RadioGroup value={method} onChange={(e) => setMethod(e.target.value)}>
-        <FormControlLabel value="COD" control={<Radio />} label="Cash on Delivery" />
-        <FormControlLabel value="UPI" control={<Radio />} label="UPI" />
-        <FormControlLabel value="CARD" control={<Radio />} label="Card" />
-      </RadioGroup>
+      <Typography variant="h6" sx={{ mb: 2 }}>
+        Select Payment Method
+      </Typography>
 
       <Button
-        variant="contained"
-        sx={{ mt: 2 }}
-        disabled={!method}
-        onClick={handleContinue}
+        sx={{ mr: 2 }}
+        variant={paymentMethod === "UPI" ? "contained" : "outlined"}
+        onClick={() => onSelect("UPI")}
       >
-        Continue
+        UPI
       </Button>
+
+      <Button
+        variant={paymentMethod === "COD" ? "contained" : "outlined"}
+        onClick={() => onSelect("COD")}
+      >
+        Cash on Delivery
+      </Button>
+
+      <Box sx={{ mt: 3 }}>
+        <Button variant="contained" disabled={!paymentMethod} onClick={onNext}>
+          Continue
+        </Button>
+      </Box>
     </Box>
   );
 }

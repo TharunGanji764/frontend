@@ -43,6 +43,7 @@ export default function HomePage({ productsData }: any) {
               title="Featured Products"
               products={productsdata}
               getProducts={getProducts}
+              isLoading={isLoading}
             />
           )}
           {bestSellers.length > 0 && (
@@ -64,12 +65,30 @@ export default function HomePage({ productsData }: any) {
 
 export async function getServerSideProps() {
   const productsurl = `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_PRODUCTS_ENDPOINT}?page=1&limit=6`;
-  const productsresponse = await fetch(productsurl);
-  const productsresult = await productsresponse?.json();
 
-  return {
-    props: {
-      productsData: productsresult,
-    },
-  };
+  try {
+    const productsresponse = await fetch(productsurl);
+    if (!productsresponse.ok) {
+      return {
+        props: {
+          productsData: [],
+          hasError: true,
+        },
+      };
+    }
+    const productsresult = await productsresponse.json();
+    return {
+      props: {
+        productsData: productsresult ?? [],
+        hasError: false,
+      },
+    };
+  } catch (error) {
+    return {
+      props: {
+        productsData: [],
+        hasError: true,
+      },
+    };
+  }
 }

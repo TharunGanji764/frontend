@@ -45,7 +45,7 @@ export default function LoginForm() {
       );
 
       router.push("/");
-      router.reload();
+      // router.reload();
     } catch (err: any) {
       dispatch(
         showToast({

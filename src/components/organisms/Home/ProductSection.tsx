@@ -1,18 +1,28 @@
-import { Grid, Typography, Box, Button } from "@mui/material";
+import {
+  Grid,
+  Typography,
+  Box,
+  Button,
+  CircularProgress,
+  Skeleton,
+} from "@mui/material";
 import ProductCard from "@/components/molecules/ProductCard/ProductCard";
 import { useState } from "react";
 import { ProductsContainer, ProductsSectionContainer } from "./Styles";
+import Loader from "@/components/atoms/Loader";
 
 interface Props {
   title: string;
   products: any[];
   getProducts?: (args: { page: number; limit: number }) => void;
+  isLoading?: any;
 }
 
 export default function ProductSection({
   title,
   products,
   getProducts,
+  isLoading,
 }: Props) {
   const [page, setPage] = useState(2);
   const limit = 4;
@@ -39,6 +49,17 @@ export default function ProductSection({
             <ProductCard product={p} />
           </Grid>
         ))}
+        {isLoading &&
+          Array?.from({ length: limit })?.map((_, i) => (
+            <Grid item key={`skeleton-${i}`}>
+              <Skeleton
+                variant="rectangular"
+                width={280}
+                height={360}
+                sx={{ borderRadius: 2 }}
+              />
+            </Grid>
+          ))}
       </ProductsContainer>
       {!noData && (
         <Button
