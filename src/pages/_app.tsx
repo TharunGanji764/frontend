@@ -1,49 +1,62 @@
 import type { AppProps } from "next/app";
-import { Provider } from "react-redux";
-import { persistor, store } from "@/store";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import { persistor, RootState, store } from "@/store";
 import ThemeProvider from "@/theme/ThemeProvider";
 import MainLayout from "@/layouts/MainLayout";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+
 import AppSnackbar from "@/components/atoms/AppSnackbar";
 import { PersistGate } from "redux-persist/integration/react";
 import Loader from "@/components/atoms/Loader";
+import { showLoader, hideLoader } from "@/store/slices/loaderSlice";
 
-export default function App({ Component, pageProps }: AppProps) {
+const AppContent = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
-  const [loading, setisLoading] = useState(false);
+  const dispatch = useDispatch();
+  const isLoading = useSelector((state: RootState) => state.loader.open);
 
   useEffect(() => {
-    const handleRouteChange = () => {
-      window.scrollTo(0, 0);
-    };
-    const start = () => setisLoading(true);
-    const end = () => setisLoading(false);
+    const handleScrollTop = () => window.scrollTo(0, 0);
+
+    const start = () => dispatch(showLoader());
+    const end = () => dispatch(hideLoader());
+
     router.events.on("routeChangeStart", start);
     router.events.on("routeChangeComplete", end);
     router.events.on("routeChangeError", end);
-    router.events.on("routeChangeComplete", handleRouteChange);
+    router.events.on("routeChangeComplete", handleScrollTop);
+
     return () => {
-      router.events.off("routeChangeComplete", handleRouteChange);
       router.events.off("routeChangeStart", start);
       router.events.off("routeChangeComplete", end);
       router.events.off("routeChangeError", end);
+      router.events.off("routeChangeComplete", handleScrollTop);
     };
-  }, [router.events]);
+  }, [router.events, dispatch]);
+
+  return (
+    <>
+      <Loader />
+      {!isLoading && (
+        <MainLayout>
+          <Component {...pageProps} />
+          <AppSnackbar />
+        </MainLayout>
+      )}
+    </>
+  );
+};
+
+export default function App(props: AppProps) {
   return (
     <PersistGate loading={null} persistor={persistor}>
       <Provider store={store}>
         <ThemeProvider>
-          <Loader loading={loading} />
-          {!loading && (
-            <MainLayout>
-              <Component {...pageProps} />
-              <AppSnackbar />
-            </MainLayout>
-          )}
+          <AppContent {...props} />
         </ThemeProvider>
       </Provider>
     </PersistGate>

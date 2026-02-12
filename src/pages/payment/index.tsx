@@ -6,7 +6,7 @@ type Props = {
   amount: number;
 };
 
-const Page = ({ clientSecret, orderId, amount }: Props) => {
+const Page = ({ clientSecret = "", orderId = "", amount = 0 }: Props) => {
   return (
     <StripeWrapper
       clientSecret={clientSecret}
@@ -27,7 +27,6 @@ export const getServerSideProps = async (context: any) => {
   });
   if (res?.ok) {
     const data = await res?.json();
-    console.log('data: ', data);
     return {
       props: {
         clientSecret: data?.clientSecret,
@@ -37,7 +36,11 @@ export const getServerSideProps = async (context: any) => {
     };
   }
   return {
-    props: {},
+    props: {
+      clientSecret: "",
+      orderId: "",
+      amount: 0,
+    },
   };
 };
 

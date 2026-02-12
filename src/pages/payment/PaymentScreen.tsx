@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -15,6 +15,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import GoogleIcon from "@mui/icons-material/Google";
+import type { StripePaymentElementOptions } from "@stripe/stripe-js";
 
 import {
   PaymentElement,
@@ -28,11 +29,36 @@ type Props = {
 };
 
 const PaymentScreen = ({ orderId, amount }: Props) => {
-  const [method, setMethod] = useState("card");
+  const [method, setMethod] = useState<"card" | "gpay" | "bank">("card");
   const [loading, setLoading] = useState(false);
 
   const stripe = useStripe();
   const elements = useElements();
+
+  const paymentElementOptions: StripePaymentElementOptions = useMemo(() => {
+    if (method === "card") {
+      return {
+        layout: "tabs",
+        paymentMethodOrder: ["card"],
+      };
+    }
+
+    if (method === "gpay") {
+      return {
+        layout: "tabs",
+        paymentMethodOrder: ["Google Pay"],
+      };
+    }
+
+    if (method === "bank") {
+      return {
+        layout: "tabs",
+        paymentMethodOrder: ["netbanking"],
+      };
+    }
+
+    return { layout: "tabs" };
+  }, [method]);
 
   const handlePayment = async () => {
     if (!stripe || !elements) return;
@@ -49,7 +75,6 @@ const PaymentScreen = ({ orderId, amount }: Props) => {
     setLoading(false);
 
     if (error) {
-      console.error(error.message);
       alert(error.message);
     }
   };
@@ -84,7 +109,7 @@ const PaymentScreen = ({ orderId, amount }: Props) => {
 
           <RadioGroup
             value={method}
-            onChange={(e) => setMethod(e.target.value)}
+            onChange={(e) => setMethod(e.target.value as any)}
           >
             <Stack spacing={2}>
               <PaymentOptionCard
@@ -112,7 +137,10 @@ const PaymentScreen = ({ orderId, amount }: Props) => {
 
           <Divider sx={{ my: 4, borderStyle: "dashed" }} />
 
-          <PaymentElement options={{ layout: "tabs" }} />
+          <PaymentElement
+            options={paymentElementOptions}
+            key={method} // forces re-mount when method changes
+          />
 
           <Button
             variant="contained"

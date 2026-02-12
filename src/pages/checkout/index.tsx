@@ -21,6 +21,9 @@ import AddressStep from "@/components/organisms/Checkout/AddressStep";
 import PaymentStep from "@/components/organisms/Checkout/PaymentStep";
 import ReviewStep from "@/components/organisms/Checkout/ReviewStep";
 import { useCreateOrderMutation, useGetCartQuery } from "@/store/api/apiSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { hideLoader, showLoader } from "@/store/slices/loaderSlice";
 
 const steps = ["Shipping", "Review"];
 
@@ -31,6 +34,7 @@ export default function CheckoutPage() {
   const [activeStep, setActiveStep] = useState(0);
   const [address, setAddress] = useState<any>(null);
   const [createOrder] = useCreateOrderMutation();
+  const dispatch = useDispatch();
 
   const idempotencyKey = useRef(uuidv4());
 
@@ -46,6 +50,7 @@ export default function CheckoutPage() {
   const handleBack = () => setActiveStep((prev) => prev - 1);
 
   const handleCreateOrder = async () => {
+    dispatch(showLoader());
     const res = await createOrder({
       shippingAddressId: address?.id,
       headers: {
@@ -53,14 +58,9 @@ export default function CheckoutPage() {
       },
     });
     if (res?.data) {
-      router.push(`/payment?orderId=${res?.data?.orderNumber}`);
+      await router.push(`/payment?orderId=${res?.data?.orderNumber}`);
+      dispatch(hideLoader());
     }
-    // if (!res.ok) {
-    //   alert("Failed to create order. Please try again.");
-    //   return;
-    // }
-
-    // router.push(`/payment?orderId=${data?.orderId}`);
   };
 
   return (

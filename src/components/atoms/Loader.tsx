@@ -1,6 +1,8 @@
 import React from "react";
 import { Box, Typography, keyframes } from "@mui/material";
 import { LoaderBox, LoaderContainer, TextFadeOut } from "./Styles";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 const fillText = keyframes`
   0%,100% { width: 0%;opacity:0; }
@@ -12,8 +14,9 @@ const fadeInOut = keyframes`
   50% { opacity: 1; }
 `;
 
-const Loader = ({ loading }: { loading: boolean }) => {
-  if (!loading) return;
+const Loader = () => {
+  const isLoading = useSelector((state: RootState) => state.loader.open);
+  if (!isLoading) return;
   return (
     <LoaderContainer>
       <Box sx={{ textAlign: "center" }}>
