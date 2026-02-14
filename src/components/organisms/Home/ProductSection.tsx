@@ -1,15 +1,7 @@
-import {
-  Grid,
-  Typography,
-  Box,
-  Button,
-  CircularProgress,
-  Skeleton,
-} from "@mui/material";
+import { Grid, Typography, Button, Skeleton } from "@mui/material";
 import ProductCard from "@/components/molecules/ProductCard/ProductCard";
 import { useState } from "react";
 import { ProductsContainer, ProductsSectionContainer } from "./Styles";
-import Loader from "@/components/atoms/Loader";
 
 interface Props {
   title: string;

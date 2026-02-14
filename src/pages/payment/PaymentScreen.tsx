@@ -22,6 +22,7 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
+import { useRouter } from "next/router";
 
 type Props = {
   orderId: string;
@@ -34,6 +35,7 @@ const PaymentScreen = ({ orderId, amount }: Props) => {
 
   const stripe = useStripe();
   const elements = useElements();
+  const router = useRouter();
 
   const paymentElementOptions: StripePaymentElementOptions = useMemo(() => {
     if (method === "card") {
@@ -68,14 +70,20 @@ const PaymentScreen = ({ orderId, amount }: Props) => {
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `http://localhost:3000/payment-success?orderId=${orderId}`,
+        return_url: `http://localhost:3001/payment/result?orderId=${orderId}`,
       },
     });
 
     setLoading(false);
 
     if (error) {
-      alert(error.message);
+      router.push({
+        pathname: "/payment/failed",
+        query: {
+          reason: error.message || "Payment declined",
+          orderId,
+        },
+      });
     }
   };
 
@@ -137,10 +145,7 @@ const PaymentScreen = ({ orderId, amount }: Props) => {
 
           <Divider sx={{ my: 4, borderStyle: "dashed" }} />
 
-          <PaymentElement
-            options={paymentElementOptions}
-            key={method} // forces re-mount when method changes
-          />
+          <PaymentElement options={paymentElementOptions} key={method} />
 
           <Button
             variant="contained"

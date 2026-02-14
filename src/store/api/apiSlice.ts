@@ -3,6 +3,7 @@ import { baseQueryWithAuth } from "./baseQuery";
 import { updateProfile } from "../slices/userSlice";
 import { addCategories } from "../slices/categorySlice";
 import { addItemToCart } from "../slices/cartSlice";
+import { headers } from "next/headers";
 
 export const apiSlice = createApi({
   reducerPath: "api",
@@ -73,7 +74,6 @@ export const apiSlice = createApi({
         method: "POST",
         body,
       }),
-
       invalidatesTags: ["Cart"],
     }),
 
@@ -119,6 +119,14 @@ export const apiSlice = createApi({
         body,
       }),
     }),
+    retryPayment: builder.mutation<any, { orderId: string; headers: any }>({
+      query: ({ orderId, headers }) => ({
+        url: `${process.env.NEXT_PUBLIC_API_CREATE_ORDER_ENDPOINT}/${orderId}/retry-payment`,
+        method: "POST",
+        headers,
+        body: { orderId },
+      }),
+    }),
   }),
 });
 
@@ -133,4 +141,5 @@ export const {
   useRemoveFromCartMutation,
   useGetAddressQuery,
   useCreateOrderMutation,
+  useRetryPaymentMutation,
 } = apiSlice;

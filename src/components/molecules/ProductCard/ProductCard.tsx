@@ -47,20 +47,24 @@ export default function ProductCard({ product }: Props) {
 
   const handleAddFirst = async () => {
     try {
-      await addToCart({
+      const res = await addToCart({
         product_id: product?.sku,
         quantity: 1,
       });
-      dispatch(
-        showToast({
-          message: "Item added to cart successfully",
-          severity: "success",
-        }),
-      );
+      if (!(res?.error as any)) {
+        return dispatch(
+          showToast({
+            message: "Item added to cart successfully",
+            severity: "success",
+          }),
+        );
+      } else {
+        throw new Error((res?.error as any)?.data?.message);
+      }
     } catch (err) {
-      dispatch(
+      return dispatch(
         showToast({
-          message: err as any,
+          message: (err as any)?.message,
           severity: "error",
         }),
       );
@@ -109,11 +113,19 @@ export default function ProductCard({ product }: Props) {
     }
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (!cartItem) {
-      dispatch(addItemToCart({ ...product, quantity: 1 }));
+      await addToCart({
+        product_id: product?.sku,
+        quantity: 1,
+      });
+    } else {
+      await updateQuantity({
+        productId: product?.sku,
+        action: "Increment",
+      });
     }
-    router.push("/checkout");
+    global.window.location.href = "/checkout";
   };
 
   return (

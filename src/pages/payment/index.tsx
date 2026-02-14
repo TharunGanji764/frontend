@@ -25,12 +25,13 @@ export const getServerSideProps = async (context: any) => {
       Authorization: `Bearer ${req?.cookies?.access_token}`,
     },
   });
+
   if (res?.ok) {
     const data = await res?.json();
     return {
       props: {
         clientSecret: data?.clientSecret,
-        orderId: data?.paymentId,
+        orderId: data?.orderId,
         amount: data?.amount,
       },
     };
@@ -40,6 +41,7 @@ export const getServerSideProps = async (context: any) => {
       clientSecret: "",
       orderId: "",
       amount: 0,
+      OrderId: "",
     },
   };
 };
