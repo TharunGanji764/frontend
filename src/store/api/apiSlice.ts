@@ -3,7 +3,6 @@ import { baseQueryWithAuth } from "./baseQuery";
 import { updateProfile } from "../slices/userSlice";
 import { addCategories } from "../slices/categorySlice";
 import { addItemToCart } from "../slices/cartSlice";
-import { headers } from "next/headers";
 
 export const apiSlice = createApi({
   reducerPath: "api",
