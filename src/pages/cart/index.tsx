@@ -5,8 +5,8 @@ import {
   Grid,
   Button,
   IconButton,
-  Divider,
   Breadcrumbs,
+  Link as MuiLink,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
@@ -23,19 +23,12 @@ import {
   ButtonsContainer,
   CartContainer,
   CartItemBox,
-  InfoBox,
-  SummaryBox,
 } from "./styles";
 import Image from "next/image";
 import CartSummary from "@/components/organisms/Cart/CartSummary";
 
 export default function CartPage() {
   const { data: cart } = useGetCartQuery();
-
-  const subtotal = cart?.items?.reduce(
-    (sum: any, i: any) => sum + i?.price * i?.quantity,
-    0,
-  );
 
   const [updateQuantity] = useUpdateCartMutation();
   const [removeFromCart] = useRemoveFromCartMutation();
@@ -51,103 +44,183 @@ export default function CartPage() {
         <meta name="description" content="Your shopping cart" />
       </Head>
 
-      <CartContainer>
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" fontWeight={700} sx={{ mb: 0.5 }}>
-            Shopping Cart ({cart?.items?.length || 0} items)
-          </Typography>
-          <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />}>
-            <Link href="/" style={{ textDecoration: "none" }}>
-              <Typography variant="body2" color="text.secondary">
-                Home
-              </Typography>
-            </Link>
-            <Typography variant="body2" color="text.primary">
-              Cart
+      <Box sx={{ bgcolor: "#F8F9FA", minHeight: "100vh", display: "flex" }}>
+        <Box sx={{ flexGrow: 1, p: { xs: 2, md: 3 }, width: "100%" }}>
+          <Box sx={{ mb: 3, px: 0.5 }}>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 600,
+                color: "#0F172A",
+                mb: 0.5,
+                fontSize: "1.5rem",
+              }}
+            >
+              Shopping Cart ({cart?.items?.length || 0} items)
             </Typography>
-          </Breadcrumbs>
-        </Box>
-
-        {!cart || cart?.items?.length === 0 ? (
-          <Box textAlign="center" sx={{ mt: 8 }}>
-            <Typography variant="h6">Your cart is empty</Typography>
-            <Link href="/" passHref>
-              <Button sx={{ mt: 2, borderRadius: 2 }} variant="contained">
-                Continue Shopping
-              </Button>
-            </Link>
+            <Breadcrumbs
+              separator={
+                <NavigateNextIcon sx={{ fontSize: "1rem", color: "#94A3B8" }} />
+              }
+              aria-label="breadcrumb"
+            >
+              <MuiLink
+                component={Link}
+                underline="hover"
+                color="#64748B"
+                href="/"
+                sx={{ fontSize: "0.85rem", fontWeight: 500 }}
+              >
+                Home
+              </MuiLink>
+              <Typography
+                sx={{ fontSize: "0.85rem", color: "#0F172A", fontWeight: 600 }}
+              >
+                Cart
+              </Typography>
+            </Breadcrumbs>
           </Box>
-        ) : (
-          <Grid container spacing={0}>
-            <Grid item xs={12} md={7}>
-              {cart?.items?.map((item: any) => (
-                <CartItemBox key={item?.id || item?.product_id}>
-                  <Image
-                    src={item?.thumbnail || item?.product_image}
-                    width={120}
-                    height={120}
-                    alt={item?.title || item?.product_name}
-                    style={{ objectFit: "contain", marginRight: "0.625vw" }}
-                  />
 
-                  <Box sx={{ flex: 1 }}>
-                    <Typography
-                      variant="body2"
-                      fontWeight={500}
-                      color="text.secondary"
+          {!cart || cart?.items?.length === 0 ? (
+            <Box textAlign="center" sx={{ mt: 8 }}>
+              <Typography variant="h6">Your cart is empty</Typography>
+              <Link href="/" passHref>
+                <Button
+                  sx={{ mt: 2, borderRadius: 2, bgcolor: "#0F172A" }}
+                  variant="contained"
+                >
+                  Continue Shopping
+                </Button>
+              </Link>
+            </Box>
+          ) : (
+            /* Layout Grid - Matches the compact spacing of the Profile/Wishlist UI */
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <Box
+                  sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}
+                >
+                  {cart?.items?.map((item: any) => (
+                    <CartItemBox
+                      key={item?.id || item?.product_id}
+                      sx={{
+                        borderRadius: "12px",
+                        border: "1px solid #EBEBEB",
+                        bgcolor: "#fff",
+                        p: 2,
+                        m: 0, // Removing old margins to use Grid gap
+                      }}
                     >
-                      {item?.title || item?.product_name}
-                    </Typography>
-                    <Typography variant="h6" fontWeight={700} sx={{ my: 0.5 }}>
-                      ₹{item.price}
-                    </Typography>
+                      <Image
+                        src={item?.thumbnail || item?.product_image}
+                        width={100}
+                        height={100}
+                        alt={item?.title || item?.product_name}
+                        style={{ objectFit: "contain", marginRight: "16px" }}
+                      />
 
-                    <ButtonsContainer>
-                      <ButtonBox>
-                        <Button
-                          size="small"
-                          sx={{ minWidth: 36, color: "#000" }}
-                          onClick={() =>
-                            handleUpdateQuantity("Decrement", item?.product_id)
-                          }
+                      <Box sx={{ flex: 1 }}>
+                        <Typography
+                          variant="body2"
+                          fontWeight={600}
+                          color="#64748B"
+                          sx={{
+                            textTransform: "uppercase",
+                            fontSize: "0.7rem",
+                            letterSpacing: "0.05em",
+                          }}
                         >
-                          -
-                        </Button>
-                        <Typography sx={{ mx: 1, fontWeight: 600 }}>
-                          {item?.quantity}
+                          {item?.title || item?.product_name}
                         </Typography>
-                        <Button
-                          size="small"
-                          sx={{ minWidth: 36, color: "#000" }}
-                          disabled={item?.quantity >= item?.stockQty}
-                          onClick={() =>
-                            handleUpdateQuantity("Increment", item?.product_id)
-                          }
+                        <Typography
+                          variant="h6"
+                          fontWeight={800}
+                          sx={{ my: 0.5, color: "#0F172A" }}
                         >
-                          +
-                        </Button>
-                      </ButtonBox>
+                          ₹{item.price}
+                        </Typography>
 
-                      <IconButton
-                        size="small"
-                        onClick={() =>
-                          removeFromCart({ productId: item?.product_id })
-                        }
-                      >
-                        <DeleteIcon fontSize="small" color="error" />
-                      </IconButton>
-                    </ButtonsContainer>
-                  </Box>
-                </CartItemBox>
-              ))}
-            </Grid>
+                        <ButtonsContainer sx={{ mt: 1 }}>
+                          <ButtonBox
+                            sx={{
+                              border: "1px solid #E2E8F0",
+                              borderRadius: "8px",
+                            }}
+                          >
+                            <Button
+                              size="small"
+                              sx={{
+                                minWidth: 32,
+                                color: "#0F172A",
+                                fontWeight: 700,
+                              }}
+                              onClick={() =>
+                                handleUpdateQuantity(
+                                  "Decrement",
+                                  item?.product_id,
+                                )
+                              }
+                            >
+                              -
+                            </Button>
+                            <Typography
+                              sx={{
+                                mx: 1,
+                                fontWeight: 700,
+                                fontSize: "0.9rem",
+                              }}
+                            >
+                              {item?.quantity}
+                            </Typography>
+                            <Button
+                              size="small"
+                              sx={{
+                                minWidth: 32,
+                                color: "#0F172A",
+                                fontWeight: 700,
+                              }}
+                              disabled={item?.quantity >= item?.stockQty}
+                              onClick={() =>
+                                handleUpdateQuantity(
+                                  "Increment",
+                                  item?.product_id,
+                                )
+                              }
+                            >
+                              +
+                            </Button>
+                          </ButtonBox>
 
-            <Grid item xs={12} md={4}>
-              <CartSummary items={cart?.items} />
+                          <IconButton
+                            size="small"
+                            sx={{
+                              ml: 2,
+                              bgcolor: "#FFF1F2",
+                              "&:hover": { bgcolor: "#FFE4E6" },
+                            }}
+                            onClick={() =>
+                              removeFromCart({ productId: item?.product_id })
+                            }
+                          >
+                            <DeleteIcon fontSize="small" color="error" />
+                          </IconButton>
+                        </ButtonsContainer>
+                      </Box>
+                    </CartItemBox>
+                  ))}
+                </Box>
+              </Grid>
+
+              <Grid item xs={12} md={4}>
+                {/* Cart Summary stickied with same margins as profile cards */}
+                <Box sx={{ position: "sticky", top: 20 }}>
+                  <CartSummary items={cart?.items} />
+                </Box>
+              </Grid>
             </Grid>
-          </Grid>
-        )}
-      </CartContainer>
+          )}
+        </Box>
+      </Box>
     </>
   );
 }
