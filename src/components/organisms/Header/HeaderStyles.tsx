@@ -1,4 +1,5 @@
-import { AppBar, Badge, Box, styled } from "@mui/material";
+import { ColumnStack } from "@/components/commonStyles/styles";
+import { AppBar, Badge, Box, Paper, styled } from "@mui/material";
 import Link from "next/link";
 
 export const HeaderBox = styled(AppBar)({
@@ -20,6 +21,7 @@ export const SearchInputBox = styled(Box)({
   backgroundColor: "#F3F4F6",
   padding: "4px 16px",
   borderRadius: "50px",
+  position: "relative",
 });
 
 export const CartBadge = styled(Badge)({
@@ -33,4 +35,32 @@ export const MobileMenu = styled(Box)({
   "@media (min-width:640px)": {
     display: "block",
   },
+});
+
+export const ResultContainer = styled(Paper)({
+  position: "absolute",
+  top: "120%",
+  left: 0,
+  right: 0,
+  zIndex: 20,
+  maxHeight: 350,
+  overflowY: "auto",
+  borderRadius: "28px",
+  minHeight: "320px",
+  display: "flex",
+  flexDirection: "column",
+});
+
+export const LoaderContainer = styled(Box)({
+  flex: 1,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+});
+
+export const NoResultsBox = styled(ColumnStack)({
+  flex: 1,
+  alignItems: "center",
+  justifyContent: "center",
+  height: "100%",
 });

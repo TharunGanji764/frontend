@@ -31,7 +31,7 @@ export const baseQueryWithAuth = async (args: any, api: any, options: any) => {
 
       result = await baseQuery(args, api, options);
     } else {
-      localStorage.removeItem("accessToken");
+      localStorage.clear();
     }
   }
   return result;

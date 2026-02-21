@@ -13,12 +13,13 @@ const fadeInOut = keyframes`
   0%, 100% { opacity: 0; }
   50% { opacity: 1; }
 `;
-
-const Loader = () => {
-  const isLoading = useSelector((state: RootState) => state.loader.open);
-  if (!isLoading) return;
+type LoaderProps = {
+  isComponentLevel?: boolean;
+};
+const Loader = (props: LoaderProps) => {
+  const { isComponentLevel = false } = props;
   return (
-    <LoaderContainer>
+    <LoaderContainer $isComponentLevel={isComponentLevel}>
       <Box sx={{ textAlign: "center" }}>
         <LoaderBox $filltext={fillText}>
           <Typography fontSize={"2.5rem"}>ShopHub</Typography>

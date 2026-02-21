@@ -5,8 +5,8 @@ import { useRouter } from "next/router";
 
 export default function CartSummary({ items }: any) {
   const router = useRouter();
-  const subtotal = items.reduce(
-    (sum: number, i: any) => sum + i.price * i.quantity,
+  const subtotal = items?.reduce(
+    (sum: number, i: any) => sum + i?.price * i?.quantity,
     0,
   );
   const delivery = subtotal > 999 ? 0 : 99;
@@ -23,7 +23,7 @@ export default function CartSummary({ items }: any) {
       </Typography>
 
       <Link href="/checkout">
-        <Button variant="primary" fullWidth disabled={items.length === 0}>
+        <Button variant="primary" fullWidth disabled={items?.length === 0}>
           Proceed to Checkout
         </Button>
       </Link>

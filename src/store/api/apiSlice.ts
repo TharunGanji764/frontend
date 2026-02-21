@@ -3,11 +3,12 @@ import { baseQueryWithAuth } from "./baseQuery";
 import { updateProfile } from "../slices/userSlice";
 import { addCategories } from "../slices/categorySlice";
 import { addItemToCart } from "../slices/cartSlice";
+import { addToWishlist, WishlistItem } from "../slices/wishlistSlice";
 
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithAuth,
-  tagTypes: ["Cart"],
+  tagTypes: ["Cart", "WishList"],
   endpoints: (builder) => ({
     login: builder.mutation<any, { emailId: string; password: string }>({
       query: (body) => ({
@@ -126,6 +127,60 @@ export const apiSlice = createApi({
         body: { orderId },
       }),
     }),
+    autoCompleteSearch: builder.mutation<any, { query: string }>({
+      query: ({ query }) => ({
+        url: `${process.env.NEXT_PUBLIC_API_AUTOCOMPLETE_SEARCH_ENDPOINT}?q=${query}`,
+        method: "GET",
+      }),
+    }),
+    getWishlist: builder.query<any, void>({
+      query: () => ({
+        url: `${process.env.NEXT_PUBLIC_API_GETWISHLIST_ENDPOINT}`,
+        method: "GET",
+      }),
+      providesTags: ["WishList"],
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          const payload: WishlistItem[] =
+            data?.data?.map((item: any) => ({
+              id: item?.product_id,
+              image: item?.product_image,
+              mrp: item?.product_price,
+              price: item?.discounted_price,
+              rating: item?.product_rating,
+              title: item?.product_name,
+            })) || [];
+          payload.forEach((wishlistItem) =>
+            dispatch(addToWishlist(wishlistItem)),
+          );
+        } catch (err) {}
+      },
+    }),
+    addToWishlist: builder.mutation<any, { productId: string }>({
+      query: ({ productId }) => ({
+        url: `${process.env.NEXT_PUBLIC_API_ADDTOWISHLIST_ENDPOINT}`,
+        method: "POST",
+        body: {
+          productId,
+        },
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          const payload: WishlistItem = {
+            id: data?.product_id,
+            image: data?.product_image,
+            mrp: data?.product_price,
+            price: data?.discounted_price,
+            rating: data?.product_rating,
+            title: data?.product_name,
+          };
+          dispatch(addToWishlist(payload));
+        } catch (err) {}
+      },
+      invalidatesTags: ["WishList"],
+    }),
   }),
 });
 
@@ -141,4 +196,7 @@ export const {
   useGetAddressQuery,
   useCreateOrderMutation,
   useRetryPaymentMutation,
+  useAutoCompleteSearchMutation,
+  useAddToWishlistMutation,
+  useGetWishlistQuery,
 } = apiSlice;

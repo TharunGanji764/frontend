@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { removeFromWishlist } from "@/store/slices/wishlistSlice";
-import { addToCart } from "@/store/slices/cartSlice";
+import { addItemToCart } from "@/store/slices/cartSlice";
 
 export default function WishlistItem({ item }: any) {
   const dispatch = useDispatch();
@@ -19,12 +19,14 @@ export default function WishlistItem({ item }: any) {
     <Card sx={{ height: "100%" }}>
       <Box component="img" src={item.image} width="100%" />
 
-      <CardContent>
+      <CardContent
+        sx={{ display: "flex", flexDirection: "column", rowGap: "8px" }}
+      >
         <Typography fontWeight={600}>{item.title}</Typography>
         <Typography>⭐ {item.rating}</Typography>
 
         <Typography>
-          ₹{item.price}{" "}
+          ₹{item.price}
           <Typography
             component="span"
             sx={{ textDecoration: "line-through", ml: 1 }}
@@ -38,19 +40,20 @@ export default function WishlistItem({ item }: any) {
             label={`${discount}% Price Drop`}
             color="success"
             size="small"
+            sx={{ alignSelf: "start" }}
           />
         )}
 
-        <Typography sx={{ mt: 1 }}>
+        {/* <Typography sx={{ mt: 1 }}>
           {item.inStock ? "In Stock" : "Out of Stock"}
-        </Typography>
+        </Typography>  */}
 
         <Button
           fullWidth
           variant="contained"
-          disabled={!item.inStock}
+          // disabled={!item.inStock}
           onClick={() => {
-            dispatch(addToCart({ ...item, quantity: 1 }));
+            dispatch(addItemToCart({ ...item, quantity: 1 }));
             dispatch(removeFromWishlist(item.id));
           }}
         >

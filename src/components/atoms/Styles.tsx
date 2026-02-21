@@ -1,16 +1,19 @@
 import transientProps from "@/utils/TransientProps";
 import { Box, styled, Typography } from "@mui/material";
 
-export const LoaderContainer = styled(Box)({
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-    background: "rgba(255, 255, 255, 0.5)", 
-    backdropFilter: "blur(1px)",
-    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-    filter: "grayscale(10%)",
-});
+export const LoaderContainer = styled(
+  Box,
+  transientProps,
+)<{ $isComponentLevel: boolean }>(({ $isComponentLevel }) => ({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  height: $isComponentLevel ? "100%" : "100vh",
+  background: $isComponentLevel ? "transparent" : "rgba(255,255,255,0.5)",
+  backdropFilter: $isComponentLevel ? "none" : "blur(1px)",
+  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+  filter: "grayscale(10%)",
+}));
 
 export const LoaderBox = styled(
   Box,

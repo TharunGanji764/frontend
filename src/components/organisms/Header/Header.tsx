@@ -1,35 +1,22 @@
-import {
-  AppBar,
-  Toolbar,
-  Box,
-  Typography,
-  IconButton,
-  Badge,
-  Button,
-  TextField,
-} from "@mui/material";
+import { Toolbar, Typography, IconButton, Badge, Button } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import SearchIcon from "@mui/icons-material/Search";
+import { Favorite } from "@mui/icons-material";
 import { useRouter } from "next/router";
 import CategoryMenu from "./CategoryMenu";
 import Link from "next/link";
-import { useState } from "react";
-import { Favorite } from "@mui/icons-material";
+import { useEffect, useState } from "react";
 import useIsLoggedIn from "@/hooks/useIsLoggedIn";
-import {
-  CartBadge,
-  HeaderBox,
-  Logo,
-  MobileMenu,
-  SearchInputBox,
-} from "./HeaderStyles";
+import { HeaderBox, Logo, MobileMenu } from "./HeaderStyles";
 import {
   apiSlice,
+  useAutoCompleteSearchMutation,
   useGetCartQuery,
   useLogoutMutation,
 } from "@/store/api/apiSlice";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store";
+import useDebounce from "@/utils/UseDebounce";
+import SearchBar from "@/components/molecules/Filters/SearchBar";
 
 export default function Header() {
   const router = useRouter();
@@ -41,10 +28,13 @@ export default function Header() {
   const userId = JSON.parse(
     global?.window?.localStorage?.getItem("userData") || "{}",
   )?.userId;
-
   const [query, setQuery] = useState("");
   const [logout] = useLogoutMutation();
-
+  const debouncedSearch = useDebounce(query, 300);
+  const [autoCompleteSearch, { isLoading }] = useAutoCompleteSearchMutation();
+  const [searchResults, setSearchResults] = useState<
+    Array<{ product_name: string; category: string; product_id: string }>
+  >([]);
   const { cartCount } = useGetCartQuery(undefined, {
     skip: !isLoggedIn,
     selectFromResult: ({ data }) => ({
@@ -56,16 +46,23 @@ export default function Header() {
     }),
   });
 
+  useEffect(() => {
+    const fetchData = async () => {
+      if (debouncedSearch?.length > 1) {
+        const res = await autoCompleteSearch({ query: debouncedSearch });
+        setSearchResults(res?.data ?? []);
+      } else {
+        setSearchResults([]);
+      }
+    };
+    fetchData();
+  }, [debouncedSearch]);
+
   const handleLogout = async () => {
     await logout({ userId, sessionId });
     localStorage.clear();
     dispatch(apiSlice.util.resetApiState());
     router.push("/");
-  };
-
-  const handleSearch = () => {
-    if (!query.trim()) return;
-    router.push(`/search?q=${encodeURIComponent(query)}`);
   };
 
   return (
@@ -74,38 +71,27 @@ export default function Header() {
         <IconButton sx={{ display: { md: "none" } }}>
           <MenuIcon />
         </IconButton>
-
         <Logo href="/">
           <Typography variant="h6">Shop Hub</Typography>
         </Logo>
         <MobileMenu>
           <CategoryMenu />
         </MobileMenu>
-
-        <SearchInputBox>
-          <SearchIcon sx={{ color: "text.primary" }} />
-          <TextField
-            placeholder="Search products"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            sx={{
-              flex: 1,
-              "& fieldset": { border: "none" },
-            }}
-          />
-        </SearchInputBox>
-
+        <SearchBar
+          searchResults={searchResults}
+          isLoading={isLoading}
+          query={query}
+          setQuery={setQuery}
+          router={router}
+        />
         <Link href="/wishlist">
           <Favorite color="error" sx={{ height: "40px", marginTop: "12px" }} />
         </Link>
-
-        <Badge badgeContent={cartCount} color="primary" sx={{ top: "0px" }}>
+        <Badge badgeContent={cartCount} color="primary">
           <Link href="/cart">
             <IconButton>🛒</IconButton>
           </Link>
         </Badge>
-
         {!isLoggedIn ? (
           <>
             <Link href="/auth/login">
@@ -120,7 +106,7 @@ export default function Header() {
             <Link href="/profile">
               <IconButton>👤</IconButton>
             </Link>
-            <Button variant="secondary" onClick={handleLogout}>
+            <Button variant="contained" onClick={handleLogout}>
               Logout
             </Button>
           </>

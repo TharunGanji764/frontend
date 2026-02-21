@@ -6,7 +6,7 @@ export interface WishlistItem {
   price: number;
   mrp: number;
   rating: number;
-  inStock: boolean;
+  inStock?: boolean;
   image: string;
 }
 

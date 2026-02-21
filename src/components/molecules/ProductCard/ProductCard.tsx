@@ -18,7 +18,9 @@ import {
 } from "./styles";
 import {
   useAddToCartMutation,
+  useAddToWishlistMutation,
   useGetCartQuery,
+  useGetWishlistQuery,
   useRemoveFromCartMutation,
   useUpdateCartMutation,
 } from "@/store/api/apiSlice";
@@ -32,6 +34,9 @@ export default function ProductCard({ product }: Props) {
   const dispatch = useDispatch();
   const router = useRouter();
   const { data: cart } = useGetCartQuery();
+  const [addToWishList] = useAddToWishlistMutation();
+  useGetWishlistQuery();
+
   const wishlist = useSelector((s: RootState) => s?.wishlist?.items);
 
   const cartItem = cart?.items?.find(
@@ -39,7 +44,7 @@ export default function ProductCard({ product }: Props) {
   );
   const quantity = cartItem?.quantity ?? 0;
 
-  const inWishlist = wishlist?.some((i: any) => i?.id === product?.id);
+  const inWishlist = wishlist?.some((i: any) => i?.id === product?.sku);
 
   const [addToCart] = useAddToCartMutation();
   const [updateQuantity] = useUpdateCartMutation();
@@ -135,7 +140,7 @@ export default function ProductCard({ product }: Props) {
         onClick={() =>
           inWishlist
             ? dispatch(removeFromWishlist(product?.sku))
-            : dispatch(addToWishlist(product))
+            : addToWishList({ productId: product?.sku })
         }
       >
         {inWishlist ? <Favorite color="error" /> : <FavoriteBorderIcon />}

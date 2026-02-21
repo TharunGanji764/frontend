@@ -42,7 +42,7 @@ export default function ProductDetailsPage({ productData }: any) {
 
 export async function getServerSideProps(context: any) {
   const { query } = context;
-  const productDataUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_PRODUCTS_ENDPOINT}/${query?.id}`;
+  const productDataUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}${process.env.NEXT_PUBLIC_API_PRODUCT_DETAILS_ENDPOINT}/${query?.id}`;
   const response = await fetch(productDataUrl);
   const productDataResult = await response?.json();
   return {
