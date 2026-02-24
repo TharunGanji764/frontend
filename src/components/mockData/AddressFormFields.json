@@ -1,0 +1,56 @@
+[
+  {
+    "name": "full_name",
+    "label": "Full Name",
+    "placeholder": "e.g. John Doe",
+    "required": true
+  },
+  {
+    "name": "phone_number",
+    "label": "Phone Number",
+    "placeholder": "e.g. +1 234 567 8900",
+    "required": true
+  },
+  {
+    "name": "address_line",
+    "label": "Address Line 1",
+    "placeholder": "House No, Building, Street, Area",
+    "required": true
+  },
+  {
+    "name": "landmark",
+    "label": "Landmark (Optional)",
+    "placeholder": "e.g. Near Apollo Hospital",
+    "required": false
+  },
+  {
+    "name": "city",
+    "label": "City",
+    "placeholder": "Enter City",
+    "required": true
+  },
+  {
+    "name": "state",
+    "label": "State",
+    "placeholder": "Enter State",
+    "required": true
+  },
+  {
+    "name": "pincode",
+    "label": "Zip / Postal Code",
+    "placeholder": "e.g. 110001",
+    "required": true
+  },
+  {
+    "name": "tag",
+    "label": "Address Type",
+    "placeholder": "Home, Work, etc.",
+    "required": true
+  },
+  {
+    "name": "is_default",
+    "label": "Is Default",
+    "placeholder": "",
+    "required": false
+  }
+]

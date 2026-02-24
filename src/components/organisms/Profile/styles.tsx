@@ -128,7 +128,7 @@ export const ProfileBanner = styled(Box)(({ theme }) => ({
 }));
 
 export const ProfileHeroBody = styled(Box)({
-  padding: "0 1.5rem 1.4rem",
+  padding: "1.5rem 1.4rem",
   display: "flex",
   alignItems: "flex-end",
   gap: "1.1rem",
@@ -342,19 +342,29 @@ export const ProfileSectionHeader = styled(Box)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
 }));
 
-
-export const AddressCard = styled(Box)(({ theme }) => ({
+export const AddressCard = styled(
+  Box,
+  transientProps,
+)<{ $isDefault: boolean }>(({ theme, $isDefault }) => ({
   display: "flex",
   alignItems: "center",
-  gap: "0.9rem",
-  padding: "1rem 1.25rem",
-  borderRadius: "0.75rem",
-  border: `1px solid ${theme.palette.divider}`,
+  gap: "1.9vw",
+  padding: "1vw 0vw",
   backgroundColor: theme.palette.background.paper,
-  transition: "box-shadow 0.15s",
+  justifyContent: "space-between",
+  position: "relative",
+  border: "1px solid",
+  borderColor: $isDefault
+    ? theme?.palette?.primary?.main
+    : theme?.palette?.grey?.[300],
+  borderRadius: "12px",
+  transition: "transform 0.2s, box-shadow 0.2s",
   "&:hover": {
-    boxShadow: "0 4px 16px rgba(0,0,0,0.09)",
+    transform: "translateY(-2px)",
+    boxShadow: "0 12px 24px rgba(0,0,0,0.04)",
+    borderColor: "text.primary",
   },
+  overflow: "hidden",
 }));
 
 export const AddressIconBox = styled(Box)(({ theme }) => ({

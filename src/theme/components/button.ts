@@ -1,6 +1,8 @@
+import { current } from "@reduxjs/toolkit";
+import theme from "../theme";
 import { SHOPHUB_BUTTON_VARIANTS } from "./theme-constants";
 
-const { PRIMARY, SECONDARY, PRIMARY_SMALL, SECONDARY_SMALL, LINK, TEXT } =
+const { PRIMARY, SECONDARY, LINK, TEXT, PRIMARY_DELETE } =
   SHOPHUB_BUTTON_VARIANTS;
 
 export const SHOPHUB_BUTTON_ROOT: any = {
@@ -16,7 +18,7 @@ export const SHOPHUB_BUTTON_ROOT: any = {
   whiteSpace: "nowrap",
   textTransform: "none",
   borderRadius: "1.4792vw",
-  padding: "0.885vw 1.302vw",
+  padding: "0.677vw 1.042vw",
   "@media (max-width: 640px)": {
     maxHeight: "13.333vw",
     lineHeight: "140%",
@@ -62,6 +64,10 @@ export const SHOPHUB_DEFAULT_BUTTONS = [
       border: "2px solid #111827",
       background: "#FFFFFF",
       borderRadius: "1.458vw",
+      padding: "0.677vw 1.042vw",
+      maxHeight: "2.083vw",
+      fontSize: "0.729vw",
+      cursor: "pointer",
       "&:hover": {
         background: "#FFFFFF",
       },
@@ -137,46 +143,47 @@ export const SHOPHUB_EXTENDED_BUTTONS = [
       },
     },
   },
-  // {
-  //   props: { variant: PRIMARY_SMALL },
-  //   style: {
-  //     color: "#ffffff",
-  //     fontWeight: 900,
-  //     lineHeight: "140%",
-  //     fontSize: "0.729vw",
-  //     maxHeight: "2.083vw",
-  //     borderRadius: "4.167vw",
-  //     background: "#502C8E",
-  //     padding: "0.677vw 1.042vw",
-  //     "&:hover": {
-  //       background: "#2F1164",
-  //     },
-  //     "&:focus": {
-  //       outline: "2px solid #502C8E",
-  //       outlineOffset: "2px",
-  //       background: "#502C8E",
-  //     },
-  //     "&.Mui-disabled": {
-  //       "&:hover": {
-  //         background: "#502C8E",
-  //       },
-  //       "&:focus": {
-  //         outline: "unset",
-  //         outlineOffset: "0pc",
-  //         background: "#502C8E",
-  //       },
-  //       color: "#ffffff70",
-  //       background: "#502C8E",
-  //     },
-  //     "@media (max-width: 640px)": {
-  //       maxHeight: "10.667vw",
-  //       lineHeight: "140%",
-  //       fontSize: "3.733vw",
-  //       borderRadius: "21.333vw",
-  //       padding: "3.467vw 5.333vw",
-  //     },
-  //   },
-  // },
+  {
+    props: { variant: PRIMARY_DELETE },
+    style: ({ theme }: any) => ({
+      color: "#ffffff",
+      fontWeight: 900,
+      lineHeight: "140%",
+      fontSize: "0.729vw",
+      maxHeight: "2.083vw",
+      borderRadius: "4.167vw",
+      background: theme?.palette?.error?.main,
+      padding: "0.677vw 1.042vw",
+      cursor: "pointer",
+      "&:hover": {
+        background: theme?.palette?.error?.main,
+      },
+      "&:focus": {
+        outline: `2px solid ${theme?.palette?.error?.main}`,
+        outlineOffset: "2px",
+        background: theme?.palette?.error?.main,
+      },
+      "&.Mui-disabled": {
+        "&:hover": {
+          background: theme?.palette?.error?.light,
+        },
+        "&:focus": {
+          outline: "unset",
+          outlineOffset: "0pc",
+          background: theme?.palette?.error?.light,
+        },
+        color: "#ffffff",
+        background: theme?.palette?.error?.light,
+      },
+      "@media (max-width: 640px)": {
+        maxHeight: "10.667vw",
+        lineHeight: "140%",
+        fontSize: "3.733vw",
+        borderRadius: "21.333vw",
+        padding: "3.467vw 5.333vw",
+      },
+    }),
+  },
   // {
   //   props: { variant: SECONDARY_SMALL },
   //   style: {

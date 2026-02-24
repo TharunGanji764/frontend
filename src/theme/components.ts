@@ -1,5 +1,6 @@
 import { Components } from "@mui/material/styles";
 import SHOPHUB_BUTTON_THEME from "./components/button";
+import SHOPHUB_CHECKBOX_THEME from "./components/checkbox";
 
 export const components: Components = {
   MuiButton: {
@@ -25,6 +26,13 @@ export const components: Components = {
         columnGap: "18px",
         rowGap: "18px",
       },
+    },
+  },
+
+  MuiCheckbox: {
+    variants: SHOPHUB_CHECKBOX_THEME?.variants,
+    styleOverrides: {
+      root: {},
     },
   },
 
@@ -82,21 +90,21 @@ export const components: Components = {
       },
     },
   },
-  // MuiCssBaseline: {
-  //   styleOverrides: `
-  //       ::-webkit-scrollbar {
-  //         width: 8px;
-  //       }
-  //       ::-webkit-scrollbar-track {
-  //         background: transparent;
-  //       }
-  //       ::-webkit-scrollbar-thumb {
-  //         background-color: black;
-  //         border-radius: 20px;
-  //         border: 2px solid transparent;
-  //         background-clip: content-box;
-  //         width: 2px;
-  //       }
-  //     `,
-  // },
+  MuiCssBaseline: {
+    styleOverrides: `
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+          background-color: black;
+          border-radius: 20px;
+          border: 2px solid transparent;
+          background-clip: content-box;
+          width: 2px;
+        }
+      `,
+  },
 };

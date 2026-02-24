@@ -4,11 +4,12 @@ import { updateProfile } from "../slices/userSlice";
 import { addCategories } from "../slices/categorySlice";
 import { addItemToCart } from "../slices/cartSlice";
 import { addToWishlist, WishlistItem } from "../slices/wishlistSlice";
+import { url } from "inspector";
 
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithAuth,
-  tagTypes: ["Cart", "WishList"],
+  tagTypes: ["Cart", "WishList", "Address"],
   endpoints: (builder) => ({
     login: builder.mutation<any, { emailId: string; password: string }>({
       query: (body) => ({
@@ -107,6 +108,100 @@ export const apiSlice = createApi({
         url: `${process.env.NEXT_PUBLIC_API_ADDRESS_ENDPOINT}`,
         method: "GET",
       }),
+      providesTags: ["Address"],
+    }),
+    addAddress: builder.mutation<
+      any,
+      {
+        full_name: string;
+        phone_number: string;
+        address_line: string;
+        landmark: string;
+        city: string;
+        state: string;
+        pincode: string;
+        tag: string;
+        is_default: boolean;
+      }
+    >({
+      query: ({
+        full_name,
+        phone_number,
+        address_line,
+        landmark,
+        city,
+        state,
+        pincode,
+        tag,
+        is_default,
+      }) => ({
+        url: `${process.env.NEXT_PUBLIC_API_ADD_ADDRESS_ENDPOINT}`,
+        method: "POST",
+        body: {
+          full_name,
+          phone_number,
+          address_line,
+          landmark,
+          city,
+          state,
+          pincode,
+          tag,
+          is_default,
+        },
+      }),
+      invalidatesTags: ["Address"],
+    }),
+    deleteAddress: builder.mutation<any, { addressId: any }>({
+      query: ({ addressId }) => ({
+        url: `${process.env.NEXT_PUBLIC_API_DELETE_ADDRESS_ENDPOINT}`,
+        method: "DELETE",
+        body: { addressId },
+      }),
+      invalidatesTags: ["Address"],
+    }),
+    updateAddress: builder.mutation<
+      any,
+      {
+        full_name: string;
+        phone_number: string;
+        address_line: string;
+        landmark: string;
+        city: string;
+        state: string;
+        pincode: string;
+        tag: string;
+        is_default: boolean;
+        id: number | null;
+      }
+    >({
+      query: ({
+        full_name,
+        phone_number,
+        address_line,
+        landmark,
+        city,
+        state,
+        pincode,
+        tag,
+        is_default,
+        id,
+      }) => ({
+        url: `${process.env.NEXT_PUBLIC_API_UPDATE_ADDRESS_ENDPOINT}`,
+        method: "PUT",
+        body: {
+          full_name,
+          phone_number,
+          address_line,
+          landmark,
+          city,
+          state,
+          pincode,
+          tag,
+          is_default,
+          id,
+        },
+      }),
+      invalidatesTags: ["Address"],
     }),
     createOrder: builder.mutation<
       any,
@@ -127,6 +222,14 @@ export const apiSlice = createApi({
         body: { orderId },
       }),
     }),
+
+    getOrders: builder.query<any, void>({
+      query: () => ({
+        url: `${process.env.NEXT_PUBLIC_API_GET_ORDERS_ENDPOINT}`,
+        method: "GET",
+      }),
+    }),
+
     autoCompleteSearch: builder.mutation<any, { query: string }>({
       query: ({ query }) => ({
         url: `${process.env.NEXT_PUBLIC_API_AUTOCOMPLETE_SEARCH_ENDPOINT}?q=${query}`,
@@ -199,4 +302,8 @@ export const {
   useAutoCompleteSearchMutation,
   useAddToWishlistMutation,
   useGetWishlistQuery,
+  useGetOrdersQuery,
+  useAddAddressMutation,
+  useDeleteAddressMutation,
+  useUpdateAddressMutation
 } = apiSlice;

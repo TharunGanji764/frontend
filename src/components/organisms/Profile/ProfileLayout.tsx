@@ -25,35 +25,43 @@ import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import LogoutIcon from "@mui/icons-material/Logout";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-
-const sections = [
-  {
-    label: "Profile",
-    icon: <PersonOutlineIcon sx={{ fontSize: "1rem" }} />,
-    badge: null,
-  },
-  {
-    label: "Orders",
-    icon: <ShoppingBagOutlinedIcon sx={{ fontSize: "1rem" }} />,
-    badge: 3,
-  },
-  {
-    label: "Addresses",
-    icon: <LocationOnOutlinedIcon sx={{ fontSize: "1rem" }} />,
-    badge: null,
-  },
-  {
-    label: "Wishlist",
-    icon: <FavoriteBorderIcon sx={{ fontSize: "1rem" }} />,
-    badge: 12,
-  },
-];
+import {
+  useGetAddressQuery,
+  useGetOrdersQuery,
+  useGetWishlistQuery,
+} from "@/store/api/apiSlice";
 
 export default function ProfileLayout() {
   const isMobile = useMediaQuery("(max-width:900px)");
   const [tab, setTab] = useState(0);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+  const { data: wishlistData } = useGetWishlistQuery();
+  const { data: totalOrders } = useGetOrdersQuery();
+  const { data: addressList } = useGetAddressQuery();
+
+  const sections = [
+    {
+      label: "Profile",
+      icon: <PersonOutlineIcon sx={{ fontSize: "1rem" }} />,
+      badge: null,
+    },
+    {
+      label: "Orders",
+      icon: <ShoppingBagOutlinedIcon sx={{ fontSize: "1rem" }} />,
+      badge: totalOrders?.length,
+    },
+    {
+      label: "Addresses",
+      icon: <LocationOnOutlinedIcon sx={{ fontSize: "1rem" }} />,
+      badge: null,
+    },
+    {
+      label: "Wishlist",
+      icon: <FavoriteBorderIcon sx={{ fontSize: "1rem" }} />,
+      badge: wishlistData?.data?.length,
+    },
+  ];
 
   const handleLogout = () => {
     dispatch(logout());
@@ -66,10 +74,8 @@ export default function ProfileLayout() {
     <ProfileContainer>
       {!isMobile && (
         <SideBar elevation={0}>
-          {/* Heading */}
           <SidebarLabel variant="body1">My Account</SidebarLabel>
 
-          {/* Main nav items */}
           {sections.map((section, index) => (
             <SidebarTab
               key={section.label}
@@ -95,8 +101,6 @@ export default function ProfileLayout() {
           ))}
 
           <SidebarDivider />
-
-          {/* Help */}
           <SidebarLabel variant="body1">Help</SidebarLabel>
           <SidebarTab $isActive={false} $isDanger={false} onClick={() => {}}>
             <HelpOutlineIcon sx={{ fontSize: "1rem" }} />
@@ -114,7 +118,6 @@ export default function ProfileLayout() {
 
           <SidebarDivider />
 
-          {/* Logout */}
           <SidebarTab $isActive={false} $isDanger={true} onClick={handleLogout}>
             <LogoutIcon sx={{ fontSize: "1rem" }} />
             <Typography
@@ -132,7 +135,6 @@ export default function ProfileLayout() {
       )}
 
       <MainContent>
-        {/* Mobile tabs */}
         {isMobile && (
           <Tabs
             value={tab}
@@ -165,11 +167,15 @@ export default function ProfileLayout() {
           </Tabs>
         )}
 
-        {/* Tab panels */}
         <Box>
-          {tab === 0 && <ProfileOverview />}
-          {tab === 1 && <RecentOrders />}
-          {tab === 2 && <AddressManager />}
+          {tab === 0 && (
+            <ProfileOverview
+              totalWishlistItems={wishlistData?.data?.length}
+              totalOrderItems={totalOrders?.length}
+            />
+          )}
+          {tab === 1 && <RecentOrders orders={totalOrders} />}
+          {tab === 2 && <AddressManager address={addressList} />}
           {tab === 3 && <Box>Wishlist shortcut</Box>}
         </Box>
       </MainContent>

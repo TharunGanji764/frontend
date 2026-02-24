@@ -1,5 +1,4 @@
 import { Box, Typography, Button, Stack } from "@mui/material";
-import orders from "@/mock-data/orders";
 import { useRouter } from "next/router";
 
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
@@ -20,14 +19,14 @@ const statusConfig: Record<
   string,
   { label: string; bg: string; color: string }
 > = {
-  delivered: {
-    label: "Delivered",
+  ORDER_CONFIRMED: {
+    label: "Order Placed",
     bg: "rgba(22,163,74,0.10)",
     color: "#16A34A",
   },
   shipped: { label: "Shipped", bg: "rgba(245,158,11,0.10)", color: "#F59E0B" },
   pending: { label: "Pending", bg: "rgba(245,158,11,0.10)", color: "#F59E0B" },
-  cancelled: {
+  ORDER_CANCELLED: {
     label: "Cancelled",
     bg: "rgba(220,38,18,0.10)",
     color: "#DC2612",
@@ -41,7 +40,7 @@ const statusConfig: Record<
 
 function getStatusStyle(status: string) {
   return (
-    statusConfig[status?.toLowerCase()] ?? {
+    statusConfig[status] ?? {
       label: status ?? "Unknown",
       bg: "rgba(17,24,39,0.07)",
       color: "#111827",
@@ -49,13 +48,17 @@ function getStatusStyle(status: string) {
   );
 }
 
-export default function RecentOrders() {
+type RecentOrdersProps = {
+  orders: any;
+};
+
+const RecentOrders = (props: RecentOrdersProps) => {
+  const { orders } = props;
   const router = useRouter();
-  const recentOrders = orders.slice(0, 3);
+  const recentOrders = orders?.slice(0, 3);
 
   return (
     <ProfileSectionCard elevation={0}>
-      {/* ── Header ── */}
       <ProfileSectionHeader>
         <Typography
           sx={{ fontSize: "0.875rem", fontWeight: 700, color: "text.primary" }}
@@ -80,9 +83,8 @@ export default function RecentOrders() {
         </Button>
       </ProfileSectionHeader>
 
-      {/* ── Order list ── */}
       <Box sx={{ px: "1.5rem" }}>
-        {recentOrders.length === 0 ? (
+        {recentOrders?.length === 0 ? (
           <OrdersEmptyState>
             <ReceiptLongOutlinedIcon
               sx={{ fontSize: "2.5rem", color: "text.secondary", mb: 1 }}
@@ -101,24 +103,22 @@ export default function RecentOrders() {
             </Typography>
           </OrdersEmptyState>
         ) : (
-          recentOrders.map((order, index) => {
-            const status = getStatusStyle(order.status);
+          recentOrders?.map((order: any, index: number) => {
+            const status = getStatusStyle(order?.status);
 
             return (
               <OrdersRow
-                key={order.id}
+                key={order?.id}
                 sx={{
                   borderBottom:
-                    index < recentOrders.length - 1 ? "1px solid" : "none",
+                    index < recentOrders?.length - 1 ? "1px solid" : "none",
                   borderColor: "divider",
                 }}
               >
-                {/* Icon */}
                 <OrdersIconBox>
                   <ShoppingBagOutlinedIcon sx={{ fontSize: "1rem" }} />
                 </OrdersIconBox>
 
-                {/* Details */}
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                   <Typography
                     sx={{
@@ -128,9 +128,9 @@ export default function RecentOrders() {
                       lineHeight: 1.3,
                     }}
                   >
-                    Order #{order.id}
+                    Order #{order?.order_number}
                   </Typography>
-                  {order.date && (
+                  {order?.created_at && (
                     <Stack
                       direction="row"
                       alignItems="center"
@@ -141,7 +141,7 @@ export default function RecentOrders() {
                         sx={{ fontSize: "0.7rem", color: "text.secondary" }}
                       />
                       <Typography variant="body2" color="text.secondary">
-                        {order.date}
+                        {order?.created_at}
                       </Typography>
                     </Stack>
                   )}
@@ -157,7 +157,6 @@ export default function RecentOrders() {
                   )}
                 </Box>
 
-                {/* Status + total */}
                 <Stack
                   direction="column"
                   alignItems="flex-end"
@@ -176,7 +175,7 @@ export default function RecentOrders() {
                       color: "text.primary",
                     }}
                   >
-                    ₹{order.total}
+                    ₹{order.total_amount}
                   </Typography>
                 </Stack>
               </OrdersRow>
@@ -223,4 +222,6 @@ export default function RecentOrders() {
       )}
     </ProfileSectionCard>
   );
-}
+};
+
+export default RecentOrders;

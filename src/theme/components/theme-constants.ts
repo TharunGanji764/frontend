@@ -3,7 +3,7 @@ const SHOPHUB_BUTTON_VARIANTS = {
   TEXT: "text",
   PRIMARY: "primary",
   SECONDARY: "secondary",
-  PRIMARY_SMALL: "primary-s",
+  PRIMARY_DELETE: "primary-d",
   SECONDARY_SMALL: "secondary-s",
 } as const;
 

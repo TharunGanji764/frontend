@@ -17,7 +17,7 @@ export default function ProductSection({
   isLoading,
 }: Props) {
   const [page, setPage] = useState(2);
-  const limit = 4;
+  const limit = 6;
   const [noData, setNoData] = useState(false);
 
   const handleViewMoreClicked = async () => {

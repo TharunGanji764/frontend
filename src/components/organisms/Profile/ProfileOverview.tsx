@@ -1,19 +1,9 @@
-import {
-  Box,
-  Typography,
-  Button,
-  Avatar,
-  Switch,
-  Divider,
-  Stack,
-  Paper,
-} from "@mui/material";
+import { Box, Typography, Button, Avatar, Switch, Stack } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useState } from "react";
 import EditProfileModal from "@/components/molecules/Profile/EditProfileModal";
 
-// MUI Icons
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
@@ -41,56 +31,13 @@ import {
   StatusChip,
 } from "./styles";
 
-const stats = [
-  {
-    icon: <ShoppingBagOutlinedIcon sx={{ fontSize: "1.1rem" }} />,
-    value: "24",
-    label: "Total Orders",
-    variant: "default" as const,
-  },
-  {
-    icon: <FavoriteBorderIcon sx={{ fontSize: "1.1rem" }} />,
-    value: "12",
-    label: "Wishlist Items",
-    variant: "success" as const,
-  },
-  {
-    icon: <AttachMoneyIcon sx={{ fontSize: "1.1rem" }} />,
-    value: "$1.4k",
-    label: "Total Spent",
-    variant: "warning" as const,
-  },
-];
+type ProfileOverview = {
+  totalWishlistItems: number;
+  totalOrderItems: number;
+};
 
-// ── Notification prefs config ─────────────────────────────────────────────────
-const notifPrefs = [
-  {
-    key: "push",
-    icon: <NotificationsNoneIcon sx={{ fontSize: "0.95rem" }} />,
-    label: "Push Notifications",
-    desc: "Receive alerts for orders and promotions",
-  },
-  {
-    key: "email",
-    icon: <EmailOutlinedIcon sx={{ fontSize: "0.95rem" }} />,
-    label: "Email Updates",
-    desc: "Weekly newsletters and promotional offers",
-  },
-  {
-    key: "sms",
-    icon: <PhoneIphoneOutlinedIcon sx={{ fontSize: "0.95rem" }} />,
-    label: "SMS Alerts",
-    desc: "Order status updates via text message",
-  },
-  {
-    key: "restock",
-    icon: <TrendingUpIcon sx={{ fontSize: "0.95rem" }} />,
-    label: "Restock Alerts",
-    desc: "Notify when wishlist items are back in stock",
-  },
-];
-
-export default function ProfileOverview() {
+const ProfileOverview = (props: ProfileOverview) => {
+  const { totalWishlistItems, totalOrderItems } = props;
   const { profile, notificationsEnabled } = useSelector(
     (state: RootState) => state.user,
   );
@@ -106,6 +53,53 @@ export default function ProfileOverview() {
   const handleNotifToggle = (key: keyof typeof notifState) => {
     setNotifState((prev) => ({ ...prev, [key]: !prev[key] }));
   };
+  const stats = [
+    {
+      icon: <ShoppingBagOutlinedIcon sx={{ fontSize: "1.1rem" }} />,
+      value: totalOrderItems,
+      label: "Total Orders",
+      variant: "default" as const,
+    },
+    {
+      icon: <FavoriteBorderIcon sx={{ fontSize: "1.1rem" }} />,
+      value: totalWishlistItems,
+      label: "Wishlist Items",
+      variant: "success" as const,
+    },
+    {
+      icon: <AttachMoneyIcon sx={{ fontSize: "1.1rem" }} />,
+      value: "$1.4k",
+      label: "Total Spent",
+      variant: "warning" as const,
+    },
+  ];
+
+  const notifPrefs = [
+    {
+      key: "push",
+      icon: <NotificationsNoneIcon sx={{ fontSize: "0.95rem" }} />,
+      label: "Push Notifications",
+      desc: "Receive alerts for orders and promotions",
+    },
+    {
+      key: "email",
+      icon: <EmailOutlinedIcon sx={{ fontSize: "0.95rem" }} />,
+      label: "Email Updates",
+      desc: "Weekly newsletters and promotional offers",
+    },
+    {
+      key: "sms",
+      icon: <PhoneIphoneOutlinedIcon sx={{ fontSize: "0.95rem" }} />,
+      label: "SMS Alerts",
+      desc: "Order status updates via text message",
+    },
+    {
+      key: "restock",
+      icon: <TrendingUpIcon sx={{ fontSize: "0.95rem" }} />,
+      label: "Restock Alerts",
+      desc: "Notify when wishlist items are back in stock",
+    },
+  ];
 
   return (
     <Box>
@@ -148,7 +142,6 @@ export default function ProfileOverview() {
             </Typography>
           </Box>
 
-          {/* Action buttons */}
           <Stack direction="row" spacing={1} sx={{ pb: 0.5, flexShrink: 0 }}>
             <Button
               variant="outlined"
@@ -200,7 +193,6 @@ export default function ProfileOverview() {
         </ProfileHeroBody>
       </ProfileHeroCard>
 
-      {/* ── Stats Row ── */}
       <Box
         sx={{
           display: "grid",
@@ -209,10 +201,10 @@ export default function ProfileOverview() {
           mb: "1.1rem",
         }}
       >
-        {stats.map((stat) => (
-          <StatCard key={stat.label} elevation={0}>
-            <StatIconWrapper variant={stat.variant}>
-              {stat.icon}
+        {stats?.map((stat) => (
+          <StatCard key={stat?.label} elevation={0}>
+            <StatIconWrapper variant={stat?.variant}>
+              {stat?.icon}
             </StatIconWrapper>
             <Box>
               <Typography
@@ -223,21 +215,20 @@ export default function ProfileOverview() {
                   color: "text.primary",
                 }}
               >
-                {stat.value}
+                {stat?.value}
               </Typography>
               <Typography
                 variant="body2"
                 color="text.secondary"
                 sx={{ mt: 0.25 }}
               >
-                {stat.label}
+                {stat?.label}
               </Typography>
             </Box>
           </StatCard>
         ))}
       </Box>
 
-      {/* ── Personal Information ── */}
       <SectionCard elevation={0}>
         <SectionHeader>
           <Typography
@@ -318,7 +309,6 @@ export default function ProfileOverview() {
         </Box>
       </SectionCard>
 
-      {/* ── Notifications & Preferences ── */}
       <SectionCard elevation={0}>
         <SectionHeader>
           <Typography
@@ -388,4 +378,6 @@ export default function ProfileOverview() {
       <EditProfileModal open={open} onClose={() => setOpen(false)} />
     </Box>
   );
-}
+};
+
+export default ProfileOverview;
