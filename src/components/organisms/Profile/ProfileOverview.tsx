@@ -30,14 +30,16 @@ import {
   NotifIcon,
   StatusChip,
 } from "./styles";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 type ProfileOverview = {
   totalWishlistItems: number;
   totalOrderItems: number;
+  totalSpent: number;
 };
 
 const ProfileOverview = (props: ProfileOverview) => {
-  const { totalWishlistItems, totalOrderItems } = props;
+  const { totalWishlistItems, totalOrderItems, totalSpent } = props;
   const { profile, notificationsEnabled } = useSelector(
     (state: RootState) => state.user,
   );
@@ -68,7 +70,7 @@ const ProfileOverview = (props: ProfileOverview) => {
     },
     {
       icon: <AttachMoneyIcon sx={{ fontSize: "1.1rem" }} />,
-      value: "$1.4k",
+      value: formatCurrency(totalSpent),
       label: "Total Spent",
       variant: "warning" as const,
     },

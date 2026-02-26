@@ -40,6 +40,11 @@ export default function ProfileLayout() {
   const { data: totalOrders } = useGetOrdersQuery();
   const { data: addressList } = useGetAddressQuery();
 
+  const totalOrderedAmount = totalOrders?.reduce(
+    (acc: any, val: any) => acc + Number(val?.total_amount),
+    0,
+  );
+
   const sections = [
     {
       label: "Profile",
@@ -56,11 +61,11 @@ export default function ProfileLayout() {
       icon: <LocationOnOutlinedIcon sx={{ fontSize: "1rem" }} />,
       badge: null,
     },
-    {
-      label: "Wishlist",
-      icon: <FavoriteBorderIcon sx={{ fontSize: "1rem" }} />,
-      badge: wishlistData?.data?.length,
-    },
+    // {
+    //   label: "Wishlist",
+    //   icon: <FavoriteBorderIcon sx={{ fontSize: "1rem" }} />,
+    //   badge: wishlistData?.data?.length,
+    // },
   ];
 
   const handleLogout = () => {
@@ -172,6 +177,7 @@ export default function ProfileLayout() {
             <ProfileOverview
               totalWishlistItems={wishlistData?.data?.length}
               totalOrderItems={totalOrders?.length}
+              totalSpent={totalOrderedAmount}
             />
           )}
           {tab === 1 && <RecentOrders orders={totalOrders} />}

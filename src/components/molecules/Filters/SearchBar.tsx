@@ -60,30 +60,29 @@ const SearchBar = (props: any) => {
           },
         }}
         renderOption={(props, option: any) => (
-          <Box
-            component="li"
-            {...props}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start !important",
-              justifyContent: "flex-start !important",
-              width: "100%",
-              px: 2,
-              cursor: "pointer",
-              "&:hover": {
-                backgroundColor: "#f7f7f7",
-              },
-              border: "1px solid red",
-            }}
+          <Link
+            style={{ textDecoration: "none", color: "black", width: "100%" }}
+            href={`/product/${option?.product_id}`}
           >
-            <Link
-              style={{ textDecoration: "none", color: "black", width: "100%" }}
-              href={`/product/${option?.product_id}`}
+            <Box
+              component="li"
+              {...props}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start !important",
+                justifyContent: "flex-start !important",
+                width: "100%",
+                px: 2,
+                cursor: "pointer",
+                "&:hover": {
+                  backgroundColor: "#f7f7f7",
+                },
+              }}
             >
               {option?.product_name}
-            </Link>
-          </Box>
+            </Box>
+          </Link>
         )}
         renderInput={(params: any) => (
           <TextField

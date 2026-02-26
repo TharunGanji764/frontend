@@ -4,7 +4,6 @@ import { updateProfile } from "../slices/userSlice";
 import { addCategories } from "../slices/categorySlice";
 import { addItemToCart } from "../slices/cartSlice";
 import { addToWishlist, WishlistItem } from "../slices/wishlistSlice";
-import { url } from "inspector";
 
 export const apiSlice = createApi({
   reducerPath: "api",
@@ -24,7 +23,7 @@ export const apiSlice = createApi({
           const payload = {
             name: data?.username,
             email: data?.email,
-            phone: "",
+            phone: data?.mobile,
             userId: data?.userId,
           };
           dispatch(updateProfile(payload));
@@ -46,6 +45,15 @@ export const apiSlice = createApi({
         method: "POST",
         body,
       }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch({ type: "auth/logout" });
+          dispatch(apiSlice.util.resetApiState());
+        } catch (err) {
+          console.error("Logout failed to clear store:", err);
+        }
+      },
     }),
 
     getCategories: builder.query<any, void>({
@@ -305,5 +313,5 @@ export const {
   useGetOrdersQuery,
   useAddAddressMutation,
   useDeleteAddressMutation,
-  useUpdateAddressMutation
+  useUpdateAddressMutation,
 } = apiSlice;
