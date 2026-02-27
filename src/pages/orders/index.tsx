@@ -17,7 +17,7 @@ import {
 import { useDispatch } from "react-redux";
 import { addItemToCart } from "@/store/slices/cartSlice";
 import Link from "next/link";
-import { useGetOrdersQuery } from "@/store/api/apiSlice";
+import { useAddToCartMutation, useGetOrdersQuery } from "@/store/api/apiSlice";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import ReplayIcon from "@mui/icons-material/Replay";
 import FilterListIcon from "@mui/icons-material/FilterList";
@@ -29,6 +29,7 @@ export default function OrdersPage() {
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear.toString());
   const { data: totalOrders, isLoading, isError } = useGetOrdersQuery();
+  const [addToCart] = useAddToCartMutation();
 
   const years = useMemo(() => {
     return Array.from({ length: 4 }, (_, i) => (currentYear - i).toString());
@@ -48,8 +49,11 @@ export default function OrdersPage() {
   };
 
   const handleReorder = (items: any[]) => {
-    items.forEach((item) => {
-      dispatch(addItemToCart({ ...item, quantity: item.quantity }));
+    items?.forEach(async (item) => {
+      await addToCart({
+        product_id: item?.sku,
+        quantity: item?.quantity,
+      });
     });
   };
 
@@ -189,7 +193,7 @@ export default function OrdersPage() {
                   variant="contained"
                   color="inherit"
                   startIcon={<ReplayIcon />}
-                  onClick={() => handleReorder(order.items)}
+                  onClick={() => handleReorder(order?.Items)}
                   sx={{
                     borderRadius: "8px",
                     textTransform: "none",

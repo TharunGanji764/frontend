@@ -3,12 +3,13 @@ import { Box, Card, CardContent, styled } from "@mui/material";
 
 export const ProductCardContainer = styled(Card)({
   height: "100%",
-  maxWidth: "290px",
+  // maxWidth: "290px",
   minWidth: "290px",
   display: "flex",
   flexDirection: "column",
   position: "relative",
   justifyContent: "space-between",
+  // width: "100%",
 });
 
 export const CustomCardContent = styled(ColumnStack)({

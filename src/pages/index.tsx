@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { Box, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import HeroCarousel from "@/components/organisms/Home/HeroCarousel";
 import CategorySection from "@/components/organisms/Home/CategorySection";
 import ProductSection from "@/components/organisms/Home/ProductSection";
@@ -37,14 +37,16 @@ export default function HomePage({ productsData }: any) {
 
       <Box sx={{ mt: 2 }}>
         <HeroCarousel />
-        <Box sx={{ mt: 3 }}>
+        <Grid container sx={{ mt: 3 }}>
           {productsdata?.length > 0 && (
-            <ProductSection
-              title="Featured Products"
-              products={productsdata}
-              getProducts={getProducts}
-              isLoading={isLoading}
-            />
+            <Grid item>
+              <ProductSection
+                title="Featured Products"
+                products={productsdata}
+                getProducts={getProducts}
+                isLoading={isLoading}
+              />
+            </Grid>
           )}
           {bestSellers.length > 0 && (
             <ProductSection title="Best Sellers" products={bestSellers} />
@@ -57,7 +59,7 @@ export default function HomePage({ productsData }: any) {
           {products.length === 0 && (
             <Typography>No products available</Typography>
           )}
-        </Box>
+        </Grid>
       </Box>
     </>
   );

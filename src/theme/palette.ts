@@ -3,6 +3,7 @@ import { PaletteOptions } from "@mui/material/styles";
 export const palette: PaletteOptions = {
   primary: {
     main: "#111827",
+    contrastText: "#FFFFFF",
   },
   secondary: {
     main: "#6B7280",
@@ -20,9 +21,13 @@ export const palette: PaletteOptions = {
   },
   error: {
     main: "#DC2612",
-    light: "#EF4444"
+    light: "#EF4444",
   },
   warning: {
     main: "#F59E0B",
   },
+  info: {
+    main: "#2563EB",
+  },
+  divider: "#E5E7EB",
 };

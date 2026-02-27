@@ -168,7 +168,7 @@ export default function CheckoutPage() {
               >
                 <Typography variant="h6">Total</Typography>
                 <Typography variant="h6" color="primary.main">
-                  ₹{(subtotal * 1.08).toFixed(2)}
+                  ₹{subtotal.toFixed(2)}
                 </Typography>
               </Box>
 

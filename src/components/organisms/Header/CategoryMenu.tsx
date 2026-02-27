@@ -4,6 +4,8 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import CapitalizeString from "@/utils/CapitalizeString";
+import Link from "next/link";
+import theme from "@/theme/theme";
 
 export default function CategoriesDropdown() {
   const [category, setCategory] = useState("");
@@ -23,11 +25,18 @@ export default function CategoriesDropdown() {
         }}
         IconComponent={KeyboardArrowDownIcon}
       >
-        {Array.isArray(categories[0]) &&
+        {Array?.isArray(categories[0]) &&
           categories[0].map((category: any) => (
-            <MenuItem value={category} key={category}>
-              {CapitalizeString(category)}
-            </MenuItem>
+            <Link
+              href={`/category/${category}`}
+              key={category}
+              style={{
+                textDecoration: "none",
+                color: theme?.palette?.primary?.main,
+              }}
+            >
+              <MenuItem value={category}>{CapitalizeString(category)}</MenuItem>
+            </Link>
           ))}
       </Select>
     </FormControl>

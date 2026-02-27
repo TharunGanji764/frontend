@@ -2,6 +2,7 @@ import { Grid, Typography, Button, Skeleton } from "@mui/material";
 import ProductCard from "@/components/molecules/ProductCard/ProductCard";
 import { useState } from "react";
 import { ProductsContainer, ProductsSectionContainer } from "./Styles";
+import CapitalizeString from "@/utils/CapitalizeString";
 
 interface Props {
   title: string;
@@ -34,10 +35,10 @@ export default function ProductSection({
   };
   return (
     <ProductsSectionContainer>
-      <Typography variant="h5">{title}</Typography>
+      <Typography variant="h5">{CapitalizeString(title)}</Typography>
       <ProductsContainer container>
         {products?.map((p) => (
-          <Grid item key={p?.id}>
+          <Grid item key={p?.id} md={2.324}>
             <ProductCard product={p} />
           </Grid>
         ))}

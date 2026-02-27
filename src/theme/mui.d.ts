@@ -177,4 +177,9 @@ declare module "@mui/material/styles" {
     button: React.CSSProperties;
     link: React.CSSProperties;
   }
+
+  interface BreakpointOverrides {
+    xxl: true;
+    ultra: true;
+  }
 }

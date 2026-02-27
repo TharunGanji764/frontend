@@ -34,6 +34,9 @@ export const components: Components = {
     styleOverrides: {
       root: {},
     },
+    defaultProps: {
+      disableRipple: true,
+    },
   },
 
   MuiSelect: {
@@ -90,6 +93,7 @@ export const components: Components = {
       },
     },
   },
+
   MuiCssBaseline: {
     styleOverrides: `
         ::-webkit-scrollbar {

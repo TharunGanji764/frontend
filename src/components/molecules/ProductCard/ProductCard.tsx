@@ -183,7 +183,7 @@ export default function ProductCard({ product }: Props) {
             fullWidth
             sx={{ mt: 1 }}
             variant="primary"
-            disabled={!product?.stock}
+            // disabled={!product?.stock || true}
             onClick={handleAddFirst}
           >
             Add to Cart
@@ -213,7 +213,7 @@ export default function ProductCard({ product }: Props) {
           fullWidth
           sx={{ mt: 1 }}
           variant="secondary"
-          disabled={!product.stock}
+          // disabled={!product.stock}
           onClick={handleBuyNow}
         >
           Buy Now

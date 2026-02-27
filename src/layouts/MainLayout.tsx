@@ -20,10 +20,8 @@ export default function MainLayout({ children }: Props) {
     <>
       {!PROTECTED_ROUTES?.includes(path) && <AnnouncementBar />}
       {!PROTECTED_ROUTES?.includes(path) && <Header />}
-      <Container maxWidth={false} sx={{ padding: "0px !important" }}>
-        <Box minHeight="100vh" padding="0vw 1.25vw">
-          {children}
-        </Box>
+      <Container maxWidth="xxl" sx={{ minHeight: "100vh" }}>
+        {children}
       </Container>
       {!PROTECTED_ROUTES?.includes(path) && <Footer />}
       {!PROTECTED_ROUTES?.includes(path) && <ScrollToTop />}
