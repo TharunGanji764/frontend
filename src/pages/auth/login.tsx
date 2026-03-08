@@ -2,7 +2,7 @@ import Head from "next/head";
 import AuthLayout from "@/components/organisms/Auth/AuthLayout";
 import LoginForm from "@/components/organisms/Auth/LoginForm";
 import Link from "next/link";
-import { Typography } from "@mui/material";
+import { Typography, Box, Stack } from "@mui/material";
 
 export default function LoginPage() {
   return (
@@ -12,12 +12,30 @@ export default function LoginPage() {
         <meta name="description" content="Login to your Shop Hub account" />
       </Head>
 
-      <AuthLayout title="Login">
+      <AuthLayout title="Welcome Back">
         <LoginForm />
-        <Typography sx={{ mt: 2 }} variant="body2">
-          Don&apos;t have an account?{" "}
-          <Link href="/auth/register">Register</Link>
-        </Typography>
+
+        <Stack
+          direction="row"
+          justifyContent="center"
+          spacing={1}
+          sx={{ mt: 4 }}
+        >
+          <Typography variant="body2" color="text.secondary">
+            Don't have an account?
+          </Typography>
+          <Link
+            href="/auth/register"
+            style={{
+              textDecoration: "none",
+              color: "#1976d2",
+              fontWeight: 700,
+              fontSize: "0.875rem",
+            }}
+          >
+            Create Account
+          </Link>
+        </Stack>
       </AuthLayout>
     </>
   );

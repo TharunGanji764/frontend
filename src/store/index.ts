@@ -10,6 +10,7 @@ import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 import categoriesReducer from "./slices/categorySlice";
 import loaderReducer from "./slices/loaderSlice";
+import { sellerApiSlice } from "./api/sellerSlice/sellerApiSlice";
 
 const appReducer = combineReducers({
   cart: cartReducer,
@@ -18,12 +19,16 @@ const appReducer = combineReducers({
   user: userReducer,
   orders: orderReducer,
   [apiSlice.reducerPath]: apiSlice.reducer,
+  [sellerApiSlice.reducerPath]: sellerApiSlice.reducer,
   toast: toastReducer,
   categories: categoriesReducer,
   loader: loaderReducer,
 });
 
-const rootReducer = (state: ReturnType<typeof appReducer> | undefined, action: any) => {
+const rootReducer = (
+  state: ReturnType<typeof appReducer> | undefined,
+  action: any,
+) => {
   if (action.type === "auth/logout") {
     state = undefined;
     storage.removeItem("persist:root");
@@ -34,7 +39,7 @@ const rootReducer = (state: ReturnType<typeof appReducer> | undefined, action: a
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["cart", "user"], 
+  whitelist: ["cart", "user"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -44,7 +49,9 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware: any) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }).concat(apiSlice.middleware),
+    })
+      .concat(apiSlice.middleware)
+      .concat(sellerApiSlice.middleware),
 });
 
 export const persistor = persistStore(store);

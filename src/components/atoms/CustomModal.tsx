@@ -17,6 +17,7 @@ type CustomModalProps = {
   onClose: () => void;
   headingTitle?: string;
   width?: number | string;
+  height?: number | string;
   isFormModal?: boolean;
   formFields?: any;
   setFormData?: React.Dispatch<React.SetStateAction<any>>;
@@ -27,6 +28,7 @@ type CustomModalProps = {
   isDeleteModal?: boolean;
   description?: string;
   onDelete?: () => void;
+  children?: React.ReactNode;
 };
 
 const CustomModal = ({
@@ -34,6 +36,7 @@ const CustomModal = ({
   onClose,
   headingTitle,
   width = 500,
+  height = 750,
   isFormModal = false,
   formFields = [],
   setFormData,
@@ -44,6 +47,7 @@ const CustomModal = ({
   description,
   isDeleteModal = false,
   onDelete,
+  children,
 }: CustomModalProps) => {
   return (
     <Modal
@@ -66,6 +70,9 @@ const CustomModal = ({
           boxShadow: "0 24px 48px rgba(0,0,0,0.1)",
           p: 4,
           outline: "none",
+          height: height,
+          overflow: "hidden",
+          paddingBottom:"84px"
         }}
       >
         <Stack
@@ -92,89 +99,57 @@ const CustomModal = ({
         </Stack>
 
         {isFormModal && (
-          <Box>
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
-                gap: 4,
-                mt: 2,
-              }}
-            >
-              {formFields?.map((field: any) =>
-                field?.name !== "is_default" ? (
-                  <TextField
-                    id={field?.name}
-                    label={field?.label}
-                    placeholder={field?.placeholder}
-                    variant="standard"
-                    InputLabelProps={{
-                      shrink: true,
-                      sx: {
-                        fontWeight: 500,
-                        color: !!errors[field?.name]
-                          ? "error.main"
-                          : "text.primary",
-                        fontSize: "16px",
-                      },
-                    }}
-                    sx={{
-                      ".MuiInputBase-input": {
-                        "&::placeholder": {
-                          color: "#6B7280",
-                        },
-                        "&, &::placeholder": {
-                          fontWeight: 500,
-                          fontSize: "14px",
-                        },
-                      },
-                      "& .MuiFormHelperText-root": {
-                        fontSize: "10px",
-                        fontWeight: 600,
-                        marginTop: "4px",
-                      },
-                    }}
-                    onChange={(e: any) => {
-                      if (setFormData) {
-                        setFormData((prev: any) => ({
-                          ...prev,
-                          [field?.name]: e?.target?.value,
-                        }));
-                      }
-                      if (errors[field?.name]) {
-                        setErrors &&
-                          setErrors((prev: any) => {
-                            const newErrors = { ...prev };
-                            delete newErrors[field?.name];
-                            return newErrors;
-                          });
-                      }
-                    }}
-                    value={
-                      formData && formData[field?.name]
-                        ? formData[field?.name]
-                        : ""
-                    }
-                    required={field?.required}
-                    helperText={errors[field?.name] || ""}
-                    error={!!errors[field?.name]}
-                  />
-                ) : (
-                  <>
-                    <FormGroup>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            variant="gradient"
-                            checked={Boolean(formData[field?.name])}
-                          />
-                        }
+          <Box sx={{ overflow: "auto", height: "100%" }}>
+            {children ? (
+              children
+            ) : (
+              <Box>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(2, 1fr)",
+                    gap: 4,
+                    mt: 2,
+                  }}
+                >
+                  {formFields?.map((field: any) =>
+                    field?.name !== "is_default" ? (
+                      <TextField
+                        id={field?.name}
                         label={field?.label}
+                        placeholder={field?.placeholder}
+                        variant="standard"
+                        InputLabelProps={{
+                          shrink: true,
+                          sx: {
+                            fontWeight: 500,
+                            color: !!errors[field?.name]
+                              ? "error.main"
+                              : "text.primary",
+                            fontSize: "16px",
+                          },
+                        }}
+                        sx={{
+                          ".MuiInputBase-input": {
+                            "&::placeholder": {
+                              color: "#6B7280",
+                            },
+                            "&, &::placeholder": {
+                              fontWeight: 500,
+                              fontSize: "14px",
+                            },
+                          },
+                          "& .MuiFormHelperText-root": {
+                            fontSize: "10px",
+                            fontWeight: 600,
+                            marginTop: "4px",
+                          },
+                        }}
                         onChange={(e: any) => {
                           if (setFormData) {
                             setFormData((prev: any) => ({
                               ...prev,
-                              [field?.name]: e?.target?.checked,
+                              [field?.name]: e?.target?.value,
                             }));
                           }
                           if (errors[field?.name]) {
@@ -186,21 +161,59 @@ const CustomModal = ({
                               });
                           }
                         }}
+                        value={
+                          formData && formData[field?.name]
+                            ? formData[field?.name]
+                            : ""
+                        }
+                        required={field?.required}
+                        helperText={errors[field?.name] || ""}
+                        error={!!errors[field?.name]}
                       />
-                    </FormGroup>
-                  </>
-                ),
-              )}
-            </Box>
-            <Button
-              variant="contained"
-              sx={{ float: "right" }}
-              onClick={() => {
-                if (onSave) onSave();
-              }}
-            >
-              Save
-            </Button>
+                    ) : (
+                      <>
+                        <FormGroup>
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                variant="gradient"
+                                checked={Boolean(formData[field?.name])}
+                              />
+                            }
+                            label={field?.label}
+                            onChange={(e: any) => {
+                              if (setFormData) {
+                                setFormData((prev: any) => ({
+                                  ...prev,
+                                  [field?.name]: e?.target?.checked,
+                                }));
+                              }
+                              if (errors[field?.name]) {
+                                setErrors &&
+                                  setErrors((prev: any) => {
+                                    const newErrors = { ...prev };
+                                    delete newErrors[field?.name];
+                                    return newErrors;
+                                  });
+                              }
+                            }}
+                          />
+                        </FormGroup>
+                      </>
+                    ),
+                  )}
+                </Box>
+                <Button
+                  variant="contained"
+                  sx={{ float: "right" }}
+                  onClick={() => {
+                    if (onSave) onSave();
+                  }}
+                >
+                  Save
+                </Button>
+              </Box>
+            )}
           </Box>
         )}
         {isDeleteModal && (

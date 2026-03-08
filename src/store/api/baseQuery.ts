@@ -14,8 +14,12 @@ const baseQuery = fetchBaseQuery({
 
 export const baseQueryWithAuth = async (args: any, api: any, options: any) => {
   let result = await baseQuery(args, api, options);
+  console.log("result: ", result);
 
-  if (result?.error && result?.error?.status === 401) {
+  if (
+    result?.error &&
+    (result?.error?.status === 401 || result?.error?.status === 400)
+  ) {
     const refreshResult = await baseQuery(
       {
         url: process.env.NEXT_PUBLIC_API_REFRESH_ENDPOINT as string,

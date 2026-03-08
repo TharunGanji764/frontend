@@ -56,6 +56,40 @@ export const apiSlice = createApi({
       },
     }),
 
+    register: builder.mutation<
+      any,
+      {
+        emailId: string;
+        mobile: string;
+        password: string;
+        username: string;
+        storeName?: string;
+        role: string;
+      }
+    >({
+      query: (body) => ({
+        url: process.env.NEXT_PUBLIC_API_REGISTER_ENDPOINT,
+        method: "POST",
+        body,
+      }),
+    }),
+
+    resendOtp: builder.mutation<any, { emailId: string }>({
+      query: (body) => ({
+        url: process.env.NEXT_PUBLIC_API_RESEND_OTP_ENDPOINT,
+        method: "POST",
+        body,
+      }),
+    }),
+
+    verifyOtp: builder.mutation<any, { emailId: string; otp: string }>({
+      query: (body) => ({
+        url: process.env.NEXT_PUBLIC_API_VERIFY_OTP_ENDPOINT,
+        method: "POST",
+        body,
+      }),
+    }),
+
     getCategories: builder.query<any, void>({
       query: () => ({
         url: process.env.NEXT_PUBLIC_API_CATEGORIES_ENDPOINT,
@@ -314,4 +348,7 @@ export const {
   useAddAddressMutation,
   useDeleteAddressMutation,
   useUpdateAddressMutation,
+  useRegisterMutation,
+  useResendOtpMutation,
+  useVerifyOtpMutation,
 } = apiSlice;
