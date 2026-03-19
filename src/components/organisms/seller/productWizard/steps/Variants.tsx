@@ -25,6 +25,15 @@ import {
   FlashOnOutlined,
   DeleteOutline,
 } from "@mui/icons-material";
+import {
+  bulkUpdateVariants,
+  setAttributes,
+  setIsAttributesUpdated,
+  setIsVariantUpdated,
+  setVariants,
+  updateVariants,
+} from "@/store/slices/seller/productWizardSlice";
+import { useDeleteAttributesMutation } from "@/store/api/sellerSlice/sellerApiSlice";
 
 interface Props {
   state: any;
@@ -37,33 +46,47 @@ export const Variants = ({ state, dispatch }: Props) => {
   const [newValueInputs, setNewValueInputs] = useState<any>({});
   const [bulkPrice, setBulkPrice] = useState("");
   const [bulkStock, setBulkStock] = useState("");
+  const [updateAttributes] = useDeleteAttributesMutation();
+  console.log("state: ", state?.isAttributesUpdated);
 
-  // ... Logic remains the same as your original snippet ...
   const addAttribute = () => {
-    if (!newAttrName.trim() || attributes.length >= 3) return;
-    const newAttrs = [...attributes, { name: newAttrName.trim(), values: [] }];
-    dispatch({ type: "SET_ATTRIBUTES", payload: newAttrs });
+    if (!newAttrName?.trim() || attributes?.length >= 3) return;
+    const newAttrs = [...attributes, { name: newAttrName?.trim(), values: [] }];
+    dispatch(setAttributes(newAttrs));
+    dispatch(setIsVariantUpdated(true));
     setNewAttrName("");
+  };
+
+  const handleDeleteValue = (attr: any, value: string) => {
+    dispatch(setIsAttributesUpdated(true));
+    if (state?.isAttributesUpdated) {
+      updateAttributes({
+        productId: state?.productId,
+        data: { name: attr?.name, value },
+      });
+    }
   };
 
   const addValue = (attrIdx: number) => {
     const val = (newValueInputs[attrIdx] || "").trim();
     if (!val) return;
-    const newAttrs = attributes.map((a: any, i: number) =>
-      i === attrIdx ? { ...a, values: [...a.values, val] } : a,
+    const newAttrs = attributes?.map((attribute: any, index: number) =>
+      attribute?.name === attrIdx
+        ? { ...attribute, values: [...attribute?.values, val] }
+        : attribute,
     );
-    dispatch({ type: "SET_ATTRIBUTES", payload: newAttrs });
-    dispatch({
-      type: "SET_VARIANTS",
-      payload: generateCartesianVariants(newAttrs),
-    });
+    dispatch(setAttributes(newAttrs));
+    const variants = generateCartesianVariants(newAttrs, state);
+    dispatch(setVariants(variants));
+    dispatch(setIsVariantUpdated(true));
     setNewValueInputs((p: any) => ({ ...p, [attrIdx]: "" }));
   };
 
   const applyBulkPrice = () => {
     const price = parseFloat(bulkPrice);
     if (!isNaN(price) && price > 0) {
-      dispatch({ type: "BULK_UPDATE_VARIANTS", payload: { price } });
+      dispatch(bulkUpdateVariants({ price }));
+      dispatch(setIsVariantUpdated(true));
       setBulkPrice("");
     }
   };
@@ -71,20 +94,19 @@ export const Variants = ({ state, dispatch }: Props) => {
   const applyBulkStock = () => {
     const stock = parseInt(bulkStock);
     if (!isNaN(stock) && stock >= 0) {
-      dispatch({ type: "BULK_UPDATE_VARIANTS", payload: { stock } });
+      dispatch(bulkUpdateVariants({ stock }));
+      dispatch(setIsVariantUpdated(true));
       setBulkStock("");
     }
   };
 
-  const updateVariant = (index: number, field: string, value: any) =>
-    dispatch({
-      type: "UPDATE_VARIANT",
-      payload: { index, data: { [field]: value } },
-    });
+  const updateVariant = (index: number, field: string, value: any) => {
+    dispatch(updateVariants({ index, data: { [field]: value } }));
+    dispatch(setIsVariantUpdated(true));
+  };
 
   return (
     <Stack spacing={4}>
-      {/* --- Section 1: Attribute Configuration --- */}
       <Box>
         <Stack direction="row" alignItems="center" spacing={1} mb={2}>
           <LayersOutlined color="primary" />
@@ -98,7 +120,7 @@ export const Variants = ({ state, dispatch }: Props) => {
             p={3}
             bgcolor={(theme) => alpha(theme.palette.primary.main, 0.02)}
           >
-            {attributes.length < 3 ? (
+            {attributes?.length < 3 ? (
               <Stack direction="row" spacing={2}>
                 <TextField
                   fullWidth
@@ -128,9 +150,9 @@ export const Variants = ({ state, dispatch }: Props) => {
 
           <Box p={3}>
             <Stack spacing={3}>
-              {attributes.map((attr: any, ai: number) => (
+              {attributes?.map((attribute: any, index: number) => (
                 <Box
-                  key={ai}
+                  key={index}
                   sx={{
                     p: 2,
                     borderRadius: 2,
@@ -144,34 +166,41 @@ export const Variants = ({ state, dispatch }: Props) => {
                     color="primary"
                     gutterBottom
                   >
-                    {attr.name.toUpperCase()}
+                    {attribute?.name?.toUpperCase()}
                   </Typography>
 
                   <Stack direction="row" spacing={1} alignItems="center" mb={2}>
                     <TextField
                       size="small"
-                      placeholder={`Add value for ${attr.name}`}
-                      value={newValueInputs[ai] || ""}
+                      placeholder={`Add value for ${attribute?.name}`}
+                      value={newValueInputs[attribute?.name] || ""}
                       onChange={(e) =>
                         setNewValueInputs((p: any) => ({
                           ...p,
-                          [ai]: e.target.value,
+                          [attribute?.name]: e.target.value,
                         }))
                       }
-                      onKeyDown={(e) => e.key === "Enter" && addValue(ai)}
+                      onKeyDown={(e) =>
+                        e.key === "Enter" && addValue(attribute?.name)
+                      }
                       sx={{ maxWidth: 250 }}
                     />
-                    <IconButton color="primary" onClick={() => addValue(ai)}>
+                    <IconButton
+                      color="primary"
+                      onClick={() => addValue(attribute?.name)}
+                    >
                       <AddCircleOutline />
                     </IconButton>
                   </Stack>
 
                   <Stack direction="row" gap={1} flexWrap="wrap">
-                    {attr.values.map((val: string, vi: number) => (
+                    {attribute?.values?.map((value: string, index: number) => (
                       <Chip
-                        key={vi}
-                        label={val}
-                        onDelete={() => {}} // Suggest adding delete logic
+                        key={index}
+                        label={value}
+                        onDelete={() => {
+                          handleDeleteValue(attribute, value);
+                        }}
                         variant="outlined"
                         color="primary"
                         sx={{ borderRadius: 1 }}
@@ -185,8 +214,7 @@ export const Variants = ({ state, dispatch }: Props) => {
         </Paper>
       </Box>
 
-      {/* --- Section 2: Variant Management --- */}
-      {variants.length > 0 && (
+      {variants?.length > 0 && (
         <Box>
           <Stack direction="row" alignItems="center" spacing={1} mb={2}>
             <FlashOnOutlined color="warning" />
@@ -199,7 +227,6 @@ export const Variants = ({ state, dispatch }: Props) => {
             variant="outlined"
             sx={{ borderRadius: 2, overflow: "hidden" }}
           >
-            {/* Bulk Actions Header */}
             <Box
               p={2}
               sx={{
@@ -293,23 +320,25 @@ export const Variants = ({ state, dispatch }: Props) => {
                 </TableHead>
 
                 <TableBody>
-                  {variants.map((v: any, vi: number) => (
-                    <TableRow key={v.id} hover>
+                  {variants?.map((variant: any, index: number) => (
+                    <TableRow key={variant?.id} hover>
                       <TableCell>
                         <Stack direction="row" spacing={0.5}>
-                          {v.combo.map((c: any, i: number) => (
-                            <Chip
-                              key={i}
-                              label={c.value}
-                              size="small"
-                              variant="filled"
-                              sx={{
-                                fontSize: "0.7rem",
-                                height: 20,
-                                bgcolor: "grey.100",
-                              }}
-                            />
-                          ))}
+                          {variant?.attributes?.map(
+                            (attribute: any, index: number) => (
+                              <Chip
+                                key={index}
+                                label={attribute?.attribute_value}
+                                size="small"
+                                variant="filled"
+                                sx={{
+                                  fontSize: "0.7rem",
+                                  height: 20,
+                                  bgcolor: "grey.100",
+                                }}
+                              />
+                            ),
+                          )}
                         </Stack>
                       </TableCell>
 
@@ -317,12 +346,12 @@ export const Variants = ({ state, dispatch }: Props) => {
                         <TextField
                           fullWidth
                           size="small"
-                          value={v.sku}
+                          value={variant?.sku}
                           placeholder="SKU-001"
                           onChange={(e) =>
-                            updateVariant(vi, "sku", e.target.value)
+                            updateVariant(index, "sku", e.target.value)
                           }
-                          error={!v.sku.trim()}
+                          error={!variant?.sku?.trim()}
                         />
                       </TableCell>
 
@@ -331,10 +360,10 @@ export const Variants = ({ state, dispatch }: Props) => {
                           fullWidth
                           size="small"
                           type="number"
-                          value={v.price || ""}
+                          value={variant?.price || ""}
                           onChange={(e) =>
                             updateVariant(
-                              vi,
+                              index,
                               "price",
                               parseFloat(e.target.value) || 0,
                             )
@@ -346,7 +375,7 @@ export const Variants = ({ state, dispatch }: Props) => {
                               </InputAdornment>
                             ),
                           }}
-                          error={!v.price || v.price <= 0}
+                          error={!variant?.price || variant?.price <= 0}
                         />
                       </TableCell>
 
@@ -355,10 +384,10 @@ export const Variants = ({ state, dispatch }: Props) => {
                           fullWidth
                           size="small"
                           type="number"
-                          value={v.stock}
+                          value={variant?.stock}
                           onChange={(e) =>
                             updateVariant(
-                              vi,
+                              index,
                               "stock",
                               parseInt(e.target.value) || 0,
                             )

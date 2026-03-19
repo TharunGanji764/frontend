@@ -46,6 +46,7 @@ export default function LoginForm() {
         emailId: userData.email,
         password: userData.password,
       }).unwrap();
+      console.log("response: ", response);
 
       if (response?.success) {
         localStorage.setItem("accessToken", response?.data?.accessToken);

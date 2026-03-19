@@ -9,6 +9,7 @@ export const initialWizardState = {
     shortDescription: "",
     fullDescription: "",
     category: "",
+    brand: "",
   },
   attributes: [],
   variants: [],
@@ -60,6 +61,12 @@ function wizardReducer(state: any, { type, payload }: any) {
     case "RESET":
       return initialWizardState;
 
+    case "HYDRATE_PRODUCT":
+      return {
+        ...state,
+        basicInfo: { payload },
+        variants: payload.variants,
+      };
     default:
       return state;
   }

@@ -20,7 +20,20 @@ import { Variants } from "./steps/Variants";
 import { Pricing } from "./steps/Pricing";
 import { Media } from "./steps/Media";
 import { Review } from "./steps/Review";
-import { MOCK_PRODUCTS } from "@/mock-data/products.mock";
+import {
+  useCreateVariantsMutation,
+  useGetSellerProductsQuery,
+  useUpdateVariantsMutation,
+} from "@/store/api/sellerSlice/sellerApiSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
+import {
+  prepopulateProduct,
+  setIsVariantUpdated,
+  setProductId,
+  setSaveStatus,
+  setStep,
+} from "@/store/slices/seller/productWizardSlice";
 
 interface Props {
   productId?: string | null;
@@ -28,21 +41,30 @@ interface Props {
 }
 
 export const ProductWizard = ({ productId, onBack }: Props) => {
-  const [state, dispatch] = useProductWizard();
+  const { data: productsData } = useGetSellerProductsQuery();
+  const dispatch = useDispatch<AppDispatch>();
   const [completedSteps, setCompleted] = useState<number[]>([]);
   const [publishSuccess, setPublish] = useState(false);
   const [isLoading, setIsLoading] = useState(!!productId);
+  const state = useSelector((state: RootState) => state.productWizard);
+  
+  const [
+    createVariants,
+    { isLoading: createVariantsLoading, isSuccess: createVariantsSuccess },
+  ] = useCreateVariantsMutation();
+  const [
+    updateVariants,
+    { isLoading: updateVariantsLoading, isSuccess: updateVariantsSuccess },
+  ] = useUpdateVariantsMutation();
 
   useEffect(() => {
     if (productId) {
-      const existingProduct = MOCK_PRODUCTS.find((p) => p.id === productId);
+      const existingProduct = productsData?.data?.find(
+        (product: any) => product?.id === productId,
+      );
 
       if (existingProduct) {
-        dispatch({
-          type: "HYDRATE_PRODUCT",
-          payload: existingProduct,
-        });
-
+        dispatch(prepopulateProduct(existingProduct));
         setCompleted([0, 1, 2, 3]);
       }
       setIsLoading(false);
@@ -50,25 +72,35 @@ export const ProductWizard = ({ productId, onBack }: Props) => {
   }, [productId, dispatch]);
 
   useEffect(() => {
-    if (!state.productId || state.currentStep === 0) return;
+    if (!state.productId || state?.currentStep === 0) return;
+    if (state?.currentStep === 2) {
+      if (state?.isNewProduct) {
+        createVariants({ productId: productId || "", data: state.variants });
+      }
+      if (state?.isUpdatingProduct) {
+        if (state?.isVariantsUpdated) {
+          updateVariants({
+            productId: productId || "",
+            data: state?.variants,
+          });
+        }
+      }
+    }
+    if (createVariantsLoading || updateVariantsLoading) {
+      dispatch(setSaveStatus("saving"));
+    }
 
-    dispatch({ type: "SET_SAVE_STATUS", payload: "saving" });
-
-    const t = setTimeout(() => {
-      dispatch({ type: "SET_SAVE_STATUS", payload: "saved" });
-      setTimeout(
-        () => dispatch({ type: "SET_SAVE_STATUS", payload: "idle" }),
-        2000,
-      );
-    }, 900);
-
-    return () => clearTimeout(t);
-  }, [state.currentStep, state.productId, dispatch]);
+    if (createVariantsSuccess || updateVariantsSuccess) {
+      dispatch(setSaveStatus("saved"));
+      dispatch(setIsVariantUpdated(false));
+      dispatch(setSaveStatus("idle"));
+    }
+  }, [state?.currentStep, state?.productId, dispatch]);
 
   const canProceed =
-    state.currentStep === 0
+    state?.currentStep === 0
       ? selectBasicInfoValid(state)
-      : state.currentStep === 1
+      : state?.currentStep === 1
         ? selectVariantsValid(state)
         : true;
 
@@ -76,23 +108,20 @@ export const ProductWizard = ({ productId, onBack }: Props) => {
     if (!canProceed) return;
 
     if (state.currentStep === 0 && !state.productId) {
-      dispatch({
-        type: "SET_PRODUCT_ID",
-        payload: `draft_${Date.now()}`,
-      });
+      dispatch(setProductId(productId));
     }
 
     setCompleted((prev) =>
-      prev.includes(state.currentStep) ? prev : [...prev, state.currentStep],
+      prev?.includes(state.currentStep) ? prev : [...prev, state.currentStep],
     );
-    dispatch({ type: "SET_STEP", payload: state.currentStep + 1 });
+    dispatch(setStep(state.currentStep + 1));
   };
 
-  const back = () =>
-    dispatch({ type: "SET_STEP", payload: state.currentStep - 1 });
+  const back = () => dispatch(setStep(state.currentStep - 1));
 
   const publish = () => {
     setPublish(true);
+    console.log("Publishing product...", state);
     setTimeout(() => onBack(), 1500);
   };
 
@@ -145,15 +174,15 @@ export const ProductWizard = ({ productId, onBack }: Props) => {
           }}
           elevation={0}
         >
-          {state.currentStep === 0 && (
+          {state?.currentStep === 0 && (
             <BasicInfo state={state} dispatch={dispatch} />
           )}
-          {state.currentStep === 1 && (
+          {state?.currentStep === 1 && (
             <Variants state={state} dispatch={dispatch} />
           )}
-          {state.currentStep === 2 && <Pricing state={state} />}
-          {state.currentStep === 3 && <Media />}
-          {state.currentStep === 4 && <Review state={state} />}
+          {state?.currentStep === 2 && <Pricing state={state} />}
+          {state?.currentStep === 3 && <Media />}
+          {state?.currentStep === 4 && <Review state={state} />}
         </Paper>
       </Box>
 
@@ -171,7 +200,7 @@ export const ProductWizard = ({ productId, onBack }: Props) => {
             </Button>
           )}
 
-          {state.currentStep < 4 ? (
+          {state?.currentStep < 4 ? (
             <Button
               variant="contained"
               onClick={next}

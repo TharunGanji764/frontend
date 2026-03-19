@@ -50,7 +50,7 @@ export default function Header() {
     const fetchData = async () => {
       if (debouncedSearch?.length > 1) {
         const res = await autoCompleteSearch({ query: debouncedSearch });
-        setSearchResults(res?.data ?? []);
+        setSearchResults(res?.data?.data ?? []);
       } else {
         setSearchResults([]);
       }

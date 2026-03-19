@@ -49,25 +49,27 @@ import {
   ProductListStockStack,
   ProductListTableCell,
 } from "./Stylex";
+import { useGetSellerProductsQuery } from "@/store/api/sellerSlice/sellerApiSlice";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store";
+import {
+  setCreateNewProduct,
+  setUpdateNewProduct,
+} from "@/store/slices/seller/productWizardSlice";
 
-interface Props {
-  onCreateNew?: () => void;
-  onEdit?: (id: string) => void;
-}
-
-export const ProductsList = ({}: Props) => {
-  const theme = useTheme();
-
+export const ProductsList = ({}) => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatus] = useState("ALL");
-
+  const dispatch = useDispatch<AppDispatch>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
     null,
   );
+  const { data: productsData } = useGetSellerProductsQuery();
 
   const handleOpenCreateModal = () => {
     setSelectedProductId(null);
+    dispatch(setCreateNewProduct());
     setIsModalOpen(true);
   };
 
@@ -81,33 +83,31 @@ export const ProductsList = ({}: Props) => {
     setSelectedProductId(null);
   };
 
-  const filtered = useMemo(
-    () =>
-      MOCK_PRODUCTS?.filter((product: any) => {
-        const matchSearch =
-          product?.name?.toLowerCase()?.includes(search?.toLowerCase()) ||
-          product?.category?.toLowerCase()?.includes(search?.toLowerCase());
-        const matchStatus =
-          statusFilter === "ALL" || product?.status === statusFilter;
-        return matchSearch && matchStatus;
-      }),
-    [search, statusFilter],
-  );
+  const filtered = productsData?.data?.filter((product: any) => {
+    const matchSearch =
+      product?.title?.toLowerCase()?.includes(search?.toLowerCase()) ||
+      product?.category?.toLowerCase()?.includes(search?.toLowerCase());
+    const matchStatus =
+      statusFilter === "ALL" ||
+      product?.status === statusFilter?.toLocaleLowerCase();
+    return matchSearch && matchStatus;
+  });
 
-  const stats = useMemo(
-    () => ({
-      total: MOCK_PRODUCTS?.length,
-      active: MOCK_PRODUCTS?.filter((product) => product?.status === "ACTIVE")
-        ?.length,
-      draft: MOCK_PRODUCTS?.filter((product) => product?.status === "DRAFT")
-        ?.length,
-      totalStock: MOCK_PRODUCTS?.reduce(
-        (sum, product) => sum + product?.totalStock,
+  const stats = {
+    total: productsData?.data?.length,
+    active: productsData?.data?.filter(
+      (product: any) => product?.status === "active",
+    )?.length,
+    draft: productsData?.data?.filter(
+      (product: any) => product?.status === "draft",
+    )?.length,
+    totalStock: productsData?.data?.map((product: any) => {
+      return product?.variants?.reduce(
+        (sum: any, variant: any) => sum + variant?.stock,
         0,
-      ),
+      );
     }),
-    [],
-  );
+  };
 
   const statsItems = [
     {
@@ -223,93 +223,100 @@ export const ProductsList = ({}: Props) => {
             </TableHead>
 
             <TableBody>
-              {filtered?.map((product) => (
-                <TableRow
-                  key={product?.id}
-                  hover
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell>
-                    <Box>
-                      <Typography variant="body1" fontWeight={700}>
-                        {product?.name}
+              {filtered?.map((product: any) => {
+                const totalStock = product?.variants?.reduce(
+                  (sum: any, value: any) => sum + value?.stock,
+                  0,
+                );
+                return (
+                  <TableRow
+                    key={product?.id}
+                    hover
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell>
+                      <Box>
+                        <Typography variant="body1" fontWeight={700}>
+                          {product?.title}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Added on {product?.createdAt?.split("T")?.[0]}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+
+                    <TableCell>
+                      <Chip
+                        label={product?.category}
+                        size="small"
+                        variant="outlined"
+                        sx={{ borderRadius: 1, fontWeight: 500 }}
+                      />
+                    </TableCell>
+
+                    <TableCell>
+                      <StatusChip status={product?.status} />
+                    </TableCell>
+
+                    <TableCell align="right">
+                      <Typography variant="body2" fontWeight={600}>
+                        {product?.variants?.length} items
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Added on {product?.createdAt}
-                      </Typography>
-                    </Box>
-                  </TableCell>
+                    </TableCell>
 
-                  <TableCell>
-                    <Chip
-                      label={product?.category}
-                      size="small"
-                      variant="outlined"
-                      sx={{ borderRadius: 1, fontWeight: 500 }}
-                    />
-                  </TableCell>
-
-                  <TableCell>
-                    <StatusChip status={product?.status} />
-                  </TableCell>
-
-                  <TableCell align="right">
-                    <Typography variant="body2" fontWeight={600}>
-                      {product?.variantCount} items
-                    </Typography>
-                  </TableCell>
-
-                  <TableCell align="right">
-                    <ProductListStockStack>
-                      {product?.totalStock < 10 && (
-                        <Tooltip title="Low Stock Warning">
-                          <WarningAmber
-                            sx={{ fontSize: 16, color: "orange" }}
-                          />
-                        </Tooltip>
-                      )}
-                      <Typography
-                        variant="body2"
-                        fontWeight={700}
-                        color={
-                          product?.totalStock < 10
-                            ? "warning.main"
-                            : "text.primary"
-                        }
-                      >
-                        {product?.totalStock}
-                      </Typography>
-                    </ProductListStockStack>
-                  </TableCell>
-
-                  <TableCell align="right">
-                    <Typography variant="body2" fontWeight={700}>
-                      ₹{product?.price.toFixed(2)}
-                    </Typography>
-                  </TableCell>
-
-                  <TableCell align="right">
-                    <ProductListStockStack>
-                      <Tooltip title="Edit Product">
-                        <ProductListIconButton
-                          size="small"
-                          onClick={() => handleOpenEditModal(product?.id)}
+                    <TableCell align="right">
+                      <ProductListStockStack>
+                        {totalStock < 10 && (
+                          <Tooltip title="Low Stock Warning">
+                            <WarningAmber
+                              sx={{ fontSize: 16, color: "orange" }}
+                            />
+                          </Tooltip>
+                        )}
+                        <Typography
+                          variant="body2"
+                          fontWeight={700}
+                          color={
+                            totalStock < 10 ? "warning.main" : "text.primary"
+                          }
                         >
-                          <EditOutlined fontSize="small" />
-                        </ProductListIconButton>
-                      </Tooltip>
+                          {totalStock}
+                        </Typography>
+                      </ProductListStockStack>
+                    </TableCell>
 
-                      <Tooltip title="Delete">
-                        <ProductListIconButton size="small">
-                          <DeleteOutline fontSize="small" />
-                        </ProductListIconButton>
-                      </Tooltip>
-                    </ProductListStockStack>
-                  </TableCell>
-                </TableRow>
-              ))}
+                    <TableCell align="right">
+                      <Typography variant="body2" fontWeight={700}>
+                        ₹{product?.price}
+                      </Typography>
+                    </TableCell>
 
-              {filtered.length === 0 && (
+                    <TableCell align="right">
+                      <ProductListStockStack>
+                        <Tooltip title="Edit Product">
+                          <ProductListIconButton
+                            size="small"
+                            onClick={() => {
+                              handleOpenEditModal(product?.id);
+                              dispatch(setUpdateNewProduct());
+                            }}
+                          >
+                            <EditOutlined fontSize="small" />
+                          </ProductListIconButton>
+                        </Tooltip>
+
+                        <Tooltip title="Delete">
+                          <ProductListIconButton size="small">
+                            <DeleteOutline fontSize="small" />
+                          </ProductListIconButton>
+                        </Tooltip>
+                      </ProductListStockStack>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+
+              {filtered?.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={7} align="center" sx={{ py: 8 }}>
                     <Stack spacing={1} alignItems="center">

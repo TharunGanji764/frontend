@@ -81,7 +81,7 @@ export async function getServerSideProps() {
     const productsresult = await productsresponse.json();
     return {
       props: {
-        productsData: productsresult ?? [],
+        productsData: productsresult?.data ?? [],
         hasError: false,
       },
     };

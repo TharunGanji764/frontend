@@ -11,6 +11,7 @@ import { persistReducer, persistStore } from "redux-persist";
 import categoriesReducer from "./slices/categorySlice";
 import loaderReducer from "./slices/loaderSlice";
 import { sellerApiSlice } from "./api/sellerSlice/sellerApiSlice";
+import productWizardSlice from "./slices/seller/productWizardSlice";
 
 const appReducer = combineReducers({
   cart: cartReducer,
@@ -23,6 +24,7 @@ const appReducer = combineReducers({
   toast: toastReducer,
   categories: categoriesReducer,
   loader: loaderReducer,
+  productWizard: productWizardSlice,
 });
 
 const rootReducer = (

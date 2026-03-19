@@ -21,6 +21,7 @@ import {
   SubtitlesOutlined,
 } from "@mui/icons-material";
 import { CATEGORIES } from "@/constants/seller.constants";
+import { updateBasicInfo } from "@/store/slices/seller/productWizardSlice";
 
 interface Props {
   state: any;
@@ -29,16 +30,14 @@ interface Props {
 
 export const BasicInfo = ({ state, dispatch }: Props) => {
   const { basicInfo } = state;
-  const [touched, setTouch] = useState<any>({});
+  const [errors, setErrors] = useState<any>({});
   const theme = useTheme();
 
-  const touch = (f: string) => setTouch((p: any) => ({ ...p, [f]: true }));
+  const setError = (key: string) =>
+    setErrors((keys: any) => ({ ...keys, [key]: true }));
 
-  const upd = (f: string) => (v: string) =>
-    dispatch({
-      type: "UPDATE_BASIC_INFO",
-      payload: { [f]: v },
-    });
+  const update = (key: string) => (value: string) =>
+    dispatch(updateBasicInfo({ [key]: value }));
 
   return (
     <Box
@@ -74,8 +73,25 @@ export const BasicInfo = ({ state, dispatch }: Props) => {
               label="Product Name"
               placeholder="e.g. Wireless Noise Cancelling Headphones"
               required
-              value={basicInfo.name}
-              onChange={(e) => upd("name")(e.target.value)}
+              value={basicInfo?.title}
+              onChange={(e) => update("title")(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SubtitlesOutlined fontSize="small" sx={{ opacity: 0.6 }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Brand"
+              placeholder="e.g. Sony"
+              required
+              value={basicInfo.brand}
+              onChange={(e) => update("brand")(e.target.value)}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -90,14 +106,14 @@ export const BasicInfo = ({ state, dispatch }: Props) => {
             <FormControl
               fullWidth
               required
-              error={touched.category && !basicInfo.category}
+              error={errors?.category && !basicInfo?.category}
             >
               <InputLabel>Category</InputLabel>
               <Select
-                value={basicInfo.category}
+                value={basicInfo?.category}
                 label="Category"
-                onChange={(e) => upd("category")(e.target.value as string)}
-                onBlur={() => touch("category")}
+                onChange={(e) => update("category")(e.target.value as string)}
+                onBlur={() => setError("category")}
                 startAdornment={
                   <InputAdornment position="start" sx={{ mr: 1 }}>
                     <CategoryOutlined fontSize="small" sx={{ opacity: 0.6 }} />
@@ -122,7 +138,7 @@ export const BasicInfo = ({ state, dispatch }: Props) => {
                   </MenuItem>
                 ))}
               </Select>
-              {touched?.category && !basicInfo.category && (
+              {errors?.category && !basicInfo.category && (
                 <FormHelperText>
                   Selecting a category is required
                 </FormHelperText>
@@ -135,9 +151,19 @@ export const BasicInfo = ({ state, dispatch }: Props) => {
               label="Short Description"
               placeholder="A brief catchphrase for the product..."
               required
-              value={basicInfo.shortDescription}
-              onChange={(e) => upd("shortDescription")(e.target.value)}
+              value={basicInfo?.description}
+              onChange={(e) => update("description")(e.target.value)}
               helperText={`${basicInfo.shortDescription?.length || 0}/150 characters`}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <DescriptionOutlined
+                      fontSize="small"
+                      sx={{ opacity: 0.6 }}
+                    />
+                  </InputAdornment>
+                ),
+              }}
             />
           </Grid>
 
@@ -147,9 +173,9 @@ export const BasicInfo = ({ state, dispatch }: Props) => {
               multiline
               rows={5}
               label="Full Description"
-              placeholder="Describe features, materials, and benefits..."
-              value={basicInfo.fullDescription}
-              onChange={(e) => upd("fullDescription")(e.target.value)}
+              placeholder="Describe features, materials, and benefits..." 
+              value={basicInfo?.full_description}
+              onChange={(e) => update("full_description")(e.target.value)}
               sx={{
                 "& .MuiOutlinedInput-root": {
                   alignItems: "flex-start",

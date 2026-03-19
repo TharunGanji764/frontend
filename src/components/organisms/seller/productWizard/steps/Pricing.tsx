@@ -12,7 +12,6 @@ import {
   TableContainer,
   Chip,
   Box,
-  Divider,
   alpha,
   useTheme,
 } from "@mui/material";
@@ -33,24 +32,24 @@ export const Pricing = ({ state }: Props) => {
   const theme = useTheme();
   const { variants } = state;
 
-  const totalStock = variants.reduce(
-    (s: number, v: any) => s + (v.stock || 0),
+  const totalStock = variants?.reduce(
+    (sum: number, variant: any) => sum + (variant?.stock || 0),
     0,
   );
-  const prices = variants.map((v: any) => v.price || 0);
+  const prices = variants?.map((variant: any) => variant?.price || 0);
 
   const totalPriceValue = variants.reduce(
-    (s: number, v: any) => s + (v.price || 0) * (v.stock || 0),
+    (sum: number, variant: any) =>
+      sum + (variant?.price || 0) * (variant.stock || 0),
     0,
   );
 
-  const priceRange = prices.length
-    ? { min: Math.min(...prices), max: Math.max(...prices) }
+  const priceRange = prices?.length
+    ? { min: Math?.min(...prices), max: Math?.max(...prices) }
     : { min: 0, max: 0 };
 
   return (
     <Stack spacing={4}>
-      {/* Header & Meta */}
       <Box>
         <Stack direction="row" alignItems="center" spacing={1.5} mb={1}>
           <AnalyticsOutlined color="primary" />
@@ -64,7 +63,6 @@ export const Pricing = ({ state }: Props) => {
         </Typography>
       </Box>
 
-      {/* Stats Grid */}
       <Grid container spacing={3}>
         <Grid item xs={12} sm={4}>
           <StatsCard
@@ -72,8 +70,6 @@ export const Pricing = ({ state }: Props) => {
             label="Total Variants"
             value={variants.length}
             color={theme.palette.info.main}
-            // Assuming StatsCard supports a description or trend
-            sub="Unique combinations"
           />
         </Grid>
 
@@ -87,7 +83,6 @@ export const Pricing = ({ state }: Props) => {
                 ? theme.palette.success.main
                 : theme.palette.error.main
             }
-            sub="Units across all variants"
           />
         </Grid>
 
@@ -97,12 +92,10 @@ export const Pricing = ({ state }: Props) => {
             label="Inventory Value"
             value={`$${totalPriceValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
             color={theme.palette.warning.main}
-            sub="Potential gross revenue"
           />
         </Grid>
       </Grid>
 
-      {/* Detailed Breakdown Table */}
       <Paper
         variant="outlined"
         sx={{
@@ -133,29 +126,31 @@ export const Pricing = ({ state }: Props) => {
             </TableHead>
 
             <TableBody>
-              {variants.map((v: any, idx: number) => {
-                const isOutOfStock = (v.stock || 0) <= 0;
+              {variants?.map((variant: any, index: number) => {
+                const isOutOfStock = (variant?.stock || 0) <= 0;
                 return (
                   <TableRow
-                    key={v.id}
+                    key={variant?.id}
                     hover
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell>
                       <Stack direction="row" spacing={0.5} flexWrap="wrap">
-                        {v.combo.map((c: any, i: number) => (
-                          <Chip
-                            key={i}
-                            label={c.value}
-                            size="small"
-                            variant="outlined"
-                            sx={{
-                              borderRadius: 1,
-                              fontSize: "0.75rem",
-                              bgcolor: "background.paper",
-                            }}
-                          />
-                        ))}
+                        {variant?.attributes?.map(
+                          (attribute: any, index: number) => (
+                            <Chip
+                              key={index}
+                              label={attribute?.attribute_value}
+                              size="small"
+                              variant="outlined"
+                              sx={{
+                                borderRadius: 1,
+                                fontSize: "0.75rem",
+                                bgcolor: "background.paper",
+                              }}
+                            />
+                          ),
+                        )}
                       </Stack>
                     </TableCell>
 
@@ -165,7 +160,7 @@ export const Pricing = ({ state }: Props) => {
                         fontFamily="monospace"
                         color="text.secondary"
                       >
-                        {v.sku || (
+                        {variant?.sku || (
                           <Typography variant="body2" color="error">
                             MISSING SKU
                           </Typography>
@@ -175,7 +170,7 @@ export const Pricing = ({ state }: Props) => {
 
                     <TableCell align="right">
                       <Typography variant="body2" fontWeight={500}>
-                        ${(v.price || 0).toFixed(2)}
+                        ${variant?.price || 0}
                       </Typography>
                     </TableCell>
 
@@ -196,7 +191,7 @@ export const Pricing = ({ state }: Props) => {
                           fontWeight={600}
                           color={isOutOfStock ? "warning.main" : "text.primary"}
                         >
-                          {v.stock || 0}
+                          {variant?.stock || 0}
                         </Typography>
                       </Stack>
                     </TableCell>
@@ -207,7 +202,10 @@ export const Pricing = ({ state }: Props) => {
                         fontWeight={700}
                         color="primary.main"
                       >
-                        ${((v.price || 0) * (v.stock || 0)).toFixed(2)}
+                        $
+                        {(
+                          (variant?.price || 0) * (variant?.stock || 0)
+                        ).toFixed(2)}
                       </Typography>
                     </TableCell>
                   </TableRow>

@@ -7,7 +7,7 @@ import { addToWishlist, WishlistItem } from "../slices/wishlistSlice";
 
 export const apiSlice = createApi({
   reducerPath: "api",
-  baseQuery: baseQueryWithAuth,
+  baseQuery: baseQueryWithAuth(""),
   tagTypes: ["Cart", "WishList", "Address"],
   endpoints: (builder) => ({
     login: builder.mutation<any, { emailId: string; password: string }>({

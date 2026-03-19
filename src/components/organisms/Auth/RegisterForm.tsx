@@ -56,7 +56,7 @@ export default function RegisterForm() {
     e.preventDefault();
     const response = await register({ ...userData, role });
     console.log("response: ", response);
-    if (response?.data?.data?.success) {
+    if (response?.data?.success) {
       dispatch(
         showToast({
           message: response?.data?.message,
@@ -65,7 +65,7 @@ export default function RegisterForm() {
       );
       setShowOtpScreen(true);
     }
-    if (!response?.data?.data?.success) {
+    if (!response?.data?.success) {
       dispatch(
         showToast({
           message: response?.data?.message || "Registration failed",
@@ -77,20 +77,20 @@ export default function RegisterForm() {
 
   const handleCreateAccount = async (data: any) => {
     const response = await verifyOtp({ emailId: userData?.emailId, otp: data });
-    if (response?.data?.data?.success) {
+    if (response?.data?.success) {
       dispatch(
         showToast({
-          message: response?.data?.message,
+          message: response?.data?.data?.message,
           severity: "success",
         }),
       );
       setShowOtpScreen(false);
       router.push("/auth/login");
     }
-    if (!response?.data?.data?.success) {
+    if (!response?.data?.success) {
       dispatch(
         showToast({
-          message: response?.data?.message || "OTP verification failed",
+          message: response?.data?.data?.message || "OTP verification failed",
           severity: "error",
         }),
       );
